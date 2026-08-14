@@ -2,8 +2,11 @@ from memory_manager import MemoryManager
 
 
 class Assistant:
-    def __init__(self, project_root):
-        self.memory_manager = MemoryManager(project_root)
+    def __init__(self, project_root, memory_service=None):
+        if memory_service is None:
+            memory_service = MemoryManager(project_root)
+
+        self.memory_manager = memory_service
 
     def process_command(self, command):
         command = command.strip()

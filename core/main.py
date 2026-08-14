@@ -11,8 +11,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 sys.path.insert(0, str(PROJECT_ROOT / "Modules"))
 
-from memory_manager import MemoryManager
 from assistant import Assistant
+from json_memory_repository import JsonMemoryRepository
+from memory_service import MemoryService
 
 # Load configuration
 
@@ -21,10 +22,12 @@ CONFIG_FILE = PROJECT_ROOT / "Config" / "config.json"
 with open(CONFIG_FILE, "r", encoding="utf-8") as file:
     config = json.load(file)
 
-# Load memory through the MemoryManager
+# Create the memory service
 
-memory_manager = MemoryManager(PROJECT_ROOT)
-memory = memory_manager.load()
+MEMORY_FILE = PROJECT_ROOT / "Memory" / "memory.json"
+memory_repository = JsonMemoryRepository(MEMORY_FILE)
+memory_service = MemoryService(memory_repository)
+memory = memory_service.search("")
 
 # Locate the Logs folder
 
@@ -48,14 +51,14 @@ with open(LOG_FILE, "a", encoding="utf-8") as file:
 print(config["name"])
 print(f"{config['assistant']} is online.")
 print("System initialization successful.")
-print(f"Memory loaded: {len(memory['memories'])} memories.")
+print(f"Memory loaded: {len(memory)} memories.")
 print()
 print("Type 'help' for available commands.")
 print()
 
 # Start the Assistant command interface
 
-assistant = Assistant(PROJECT_ROOT)
+assistant = Assistant(PROJECT_ROOT, memory_service)
 
 while True:
     try:

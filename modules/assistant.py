@@ -2,11 +2,17 @@ from memory_manager import MemoryManager
 
 
 class Assistant:
-    def __init__(self, project_root, memory_service=None):
+    def __init__(
+        self,
+        project_root,
+        memory_service=None,
+        capability_runtime=None,
+    ):
         if memory_service is None:
             memory_service = MemoryManager(project_root)
 
         self.memory_manager = memory_service
+        self.capability_runtime = capability_runtime
 
     def process_command(self, command):
         command = command.strip()
@@ -88,6 +94,15 @@ class Assistant:
 
         print("Unknown command. Type 'help' for available commands.")
         return True
+
+    def execute_capability(self, capability_name, request):
+        if self.capability_runtime is None:
+            raise RuntimeError("Capability runtime is not configured")
+
+        return self.capability_runtime.execute(
+            capability_name,
+            request,
+        )
 
     def show_help(self):
         print()

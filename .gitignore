@@ -4,3 +4,4 @@ memory/
 *.key
 __pycache__/
 *.pyc
+.venv/

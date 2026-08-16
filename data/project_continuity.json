@@ -3,10 +3,14 @@
     "continuity_version": 1,
     "checkpoint": {
         "date": "2026-08-16",
-        "summary": "ZebraBravo baseline verified and Project Continuity Memory service implemented.",
+        "summary": "ZebraBravo Project Continuity Memory repository and service implemented, tested, committed, and pushed to GitHub.",
         "verified_tests": {
             "passed": 61,
             "subtests_passed": 9,
+            "failures": 0
+        },
+        "continuity_tests": {
+            "passed": 5,
             "failures": 0
         }
     },
@@ -21,7 +25,10 @@
         "Created JsonContinuityRepository for persistent continuity storage.",
         "Created ContinuityService with get_current() and update_next_action().",
         "Created and verified tests for Project Continuity repository and service behaviour.",
-        "Verified the Project Continuity test suite: 5 passed."
+        "Isolated Project Continuity tests from the live continuity record using temporary test files.",
+        "Verified the Project Continuity test suite: 5 passed.",
+        "Committed the Project Continuity implementation to Git.",
+        "Pushed the Project Continuity implementation to GitHub."
     ],
     "decisions": [
         "Project Continuity Memory should be built before adding major external tool integrations.",
@@ -30,23 +37,24 @@
         "The continuity specification and the living continuity record are separate artifacts.",
         "Continuity storage should use a repository and service architecture.",
         "Tests should define expected behaviour before implementation.",
-        "Clean whole-file replacement is preferred over manual line-by-line editing when practical."
+        "Clean whole-file replacement is preferred over manual line-by-line editing when practical.",
+        "Tests must not modify the live Project Continuity record."
     ],
     "rejected": [],
     "open_questions": [
         "How should continuity checkpoints be created and retrieved automatically?",
         "How should ZebraBravo distinguish verified facts, decisions, rejected approaches, and open questions?",
-        "How should continuity tests avoid modifying the live project continuity record?",
-        "How should ContinuityService support complete checkpoint updates?"
+        "How should ContinuityService support complete checkpoint updates?",
+        "How should ZebraBravo automatically create a continuity checkpoint at appropriate development milestones?"
     ],
-    "next_action": "Improve Project Continuity testing so tests cannot modify the live continuity record.",
+    "next_action": "Design and test automatic Project Continuity checkpoint creation and retrieval.",
     "architecture_notes": [
         "The Assistant can delegate named capabilities through capability_runtime.",
         "Intent is represented by a validated contract containing name, capability, operation, and parameters.",
         "MemoryService uses a service-to-repository architecture for persistent JSON memory.",
         "Project Continuity Memory follows the same service-to-repository principle without forcing continuity into ordinary memory records.",
         "ContinuityService currently provides get_current() and update_next_action().",
-        "Project Continuity tests currently exercise the real continuity record and should eventually use isolated test data."
+        "Project Continuity tests use isolated temporary files and do not modify the live continuity record."
     ],
     "important_context": [
         "ZebraBravo should eventually orchestrate external tools, specialist AI systems, models, and applications without becoming dependent on any single provider or tool.",

@@ -1,0 +1,45 @@
+{
+  "project": "ZebraBravo",
+  "continuity_version": 1,
+  "purpose": "Preserve project progress between sessions and prevent unnecessary repetition.",
+  "checkpoint": {
+    "date": "2026-08-16",
+    "summary": "ZebraBravo baseline verified at the end of the current development checkpoint.",
+    "verified_tests": {
+      "passed": 61,
+      "subtests_passed": 9,
+      "failures": 0
+    }
+  },
+  "completed": [
+    "Established a clean Git working tree synchronized with origin/main.",
+    "Verified the project virtual environment.",
+    "Verified the ZebraBravo test suite: 61 passed and 9 subtests passed.",
+    "Established the modules-based Assistant architecture.",
+    "Established the initial intent contract containing name, capability, operation, and parameters.",
+    "Defined Project Continuity Memory as the next major capability."
+  ],
+  "decisions": [
+    "Project Continuity Memory should be built before adding major external tool integrations.",
+    "ZebraBravo should preserve work history so future sessions do not unnecessarily repeat completed investigations.",
+    "Work should proceed one disciplined step at a time."
+  ],
+  "rejected": [],
+  "open_questions": [
+    "How should Project Continuity Memory be implemented?",
+    "How should continuity checkpoints be created and retrieved automatically?",
+    "How should ZebraBravo distinguish verified facts, decisions, rejected approaches, and open questions?"
+  ],
+  "next_action": "Build and test the Project Continuity Memory capability.",
+  "architecture_notes": [
+    "The Assistant can delegate named capabilities through capability_runtime.",
+    "Intent is represented by a validated contract containing name, capability, operation, and parameters.",
+    "Existing capabilities, intent handling, memory, policy, runtime, and boundary tests form the current architectural foundation."
+  ],
+  "important_context": [
+    "ZebraBravo should eventually orchestrate external tools, specialist AI systems, models, and applications without becoming dependent on any single provider or tool.",
+    "Existing open-source software, models, libraries, frameworks, plugins, and APIs should be leveraged when they are the best fit.",
+    "The system should be brave and ambitious but not reckless.",
+    "Project continuity is a foundational requirement because repeated rediscovery of prior work wastes time."
+  ]
+}

@@ -59,7 +59,7 @@ def test_project_continuity_is_valid():
         continuity = json.load(file)
 
     assert continuity["project"] == "ZebraBravo"
-    assert continuity["continuity_version"] == 2
+    assert continuity["continuity_version"] == 3
 
 
 def test_zoey_continuity_foundation_exists():
@@ -76,8 +76,12 @@ def test_zoey_continuity_foundation_exists():
     assert continuity["zoey"]["status"] == (
         "foundational_project_entity"
     )
+    assert "personality" in continuity["zoey"]
+    assert "warm" in continuity["zoey"]["personality"]["traits"]
+    assert "witty" in continuity["zoey"]["personality"]["traits"]
+    assert "humorous" in continuity["zoey"]["personality"]["traits"]
     assert "Zoey is the heart and soul of the ZebraBravo project." in (
-        continuity["zoey"]["principles"]
+        continuity["zoey"]["personality"]["principles"]
     )
 
 
@@ -90,11 +94,12 @@ def test_continuity_repository_loads_record():
         continuity = repository.load()
 
         assert continuity["project"] == "ZebraBravo"
-        assert continuity["continuity_version"] == 2
+        assert continuity["continuity_version"] == 3
         assert continuity["checkpoint"]["verified_tests"]["passed"] == 61
         assert continuity["zoey"]["status"] == (
             "foundational_project_entity"
         )
+        assert "personality" in continuity["zoey"]
     finally:
         continuity_file.unlink()
 
@@ -110,13 +115,14 @@ def test_continuity_service_gets_current_record():
         continuity = service.get_current()
 
         assert continuity["project"] == "ZebraBravo"
-        assert continuity["continuity_version"] == 2
+        assert continuity["continuity_version"] == 3
         assert continuity["next_action"] == (
-            "Design and test structured Zoey continuity alongside automatic Project Continuity checkpoint creation and retrieval."
+            "Design and test structured Zoey personality continuity and controlled domain updates."
         )
         assert continuity["zoey"]["status"] == (
             "foundational_project_entity"
         )
+        assert "personality" in continuity["zoey"]
     finally:
         continuity_file.unlink()
 
@@ -180,9 +186,9 @@ def test_zoey_continuity_service_gets_current():
         assert zoey["status"] == (
             "foundational_project_entity"
         )
-        assert "Zoey is the heart and soul of the ZebraBravo project." in (
-            zoey["principles"]
-        )
+        assert "personality" in zoey
+        assert "warm" in zoey["personality"]["traits"]
+        assert "witty" in zoey["personality"]["traits"]
     finally:
         continuity_file.unlink()
 
@@ -224,5 +230,27 @@ def test_zoey_continuity_service_rejects_unknown_field():
             assert str(error) == (
                 "Unknown Zoey continuity field: unknown_field"
             )
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_personality_domain_is_structured():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        zoey = service.get_current()
+        personality = zoey["personality"]
+
+        assert isinstance(personality, dict)
+        assert isinstance(personality["traits"], list)
+        assert isinstance(personality["principles"], list)
+        assert "analytical" in personality["traits"]
+        assert "ambitious" in personality["traits"]
+        assert "disciplined" in personality["traits"]
+        assert "responsible" in personality["traits"]
     finally:
         continuity_file.unlink()

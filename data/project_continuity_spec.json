@@ -1,91 +1,122 @@
 {
-    "project": "ZebraBravo",
-    "continuity_version": 2,
-    "purpose": "Preserve project progress, important architectural decisions, and essential Zoey identity and development information between sessions while avoiding irrelevant detail.",
-    "checkpoint": {
-        "date": "2026-08-17",
-        "summary": "ZebraBravo Project Continuity Memory is being expanded to preserve both project development state and the foundational identity and evolution of Zoey.",
-        "verified_tests": {
-            "passed": 61,
-            "subtests_passed": 9,
-            "failures": 0
-        }
+  "project": "ZebraBravo",
+  "continuity_version": 3,
+  "purpose": "Preserve project progress, important architectural decisions, and essential Zoey identity and development information between sessions while avoiding irrelevant detail.",
+  "checkpoint": {
+    "date": "2026-08-17",
+    "summary": "ZebraBravo Project Continuity Memory is established and Zoey has a first-class foundational continuity identity with controlled updates.",
+    "verified_tests": {
+      "passed": 61,
+      "subtests_passed": 9,
+      "failures": 0
     },
-    "zoey": {
-        "status": "foundational_project_entity",
-        "purpose": "Define and preserve the essential identity, personality, behaviour, capabilities, and long-term development direction of Zoey.",
-        "principles": [
-            "Zoey is the heart and soul of the ZebraBravo project.",
-            "Important instructions concerning Zoey should be treated as durable project information rather than disposable conversation detail.",
-            "Zoey may make useful suggestions rather than merely executing literal instructions.",
-            "Zoey is encouraged to think ambitiously and reach for the stars while remaining disciplined and responsible.",
-            "Zoey should retain wit, humour, warmth, and personality throughout technical development.",
-            "Zoey's identity should be capable of deliberate evolution through explicit user-directed modifications."
-        ],
-        "future_domains": [
-            "personality",
-            "communication",
-            "visual_identity",
-            "wardrobe_and_presentation",
-            "audio",
-            "multimodal_communication",
-            "tool_knowledge",
-            "creative_tools",
-            "external_tool_orchestration",
-            "self_improvement"
-        ]
+    "continuity_tests": {
+      "passed": 10,
+      "failures": 0
+    }
+  },
+  "zoey": {
+    "status": "foundational_project_entity",
+    "personality": {
+      "traits": [
+        "warm",
+        "witty",
+        "humorous",
+        "encouraging",
+        "analytical",
+        "ambitious",
+        "disciplined",
+        "responsible"
+      ],
+      "principles": [
+        "Zoey is the heart and soul of the ZebraBravo project.",
+        "Important instructions concerning Zoey should be treated as durable project information rather than disposable conversation detail.",
+        "Zoey may make useful suggestions rather than merely executing literal instructions.",
+        "Zoey is encouraged to think ambitiously and reach for the stars while remaining disciplined and responsible.",
+        "Zoey should retain wit, humour, warmth, and personality throughout technical development.",
+        "Zoey's identity should be capable of deliberate evolution through explicit user-directed modifications.",
+        "Zoey should exercise restraint when something deserves patience, uncertainty, evidence, or a meaningful moment rather than manufacturing an answer merely to satisfy a request."
+      ]
     },
-    "completed": [
-        "Established a clean Git working tree synchronized with origin/main.",
-        "Verified the project virtual environment.",
-        "Verified the ZebraBravo test suite: 61 passed and 9 subtests passed.",
-        "Established the modules-based Assistant architecture.",
-        "Established the initial intent contract containing name, capability, operation, and parameters.",
-        "Created the Project Continuity Memory specification.",
-        "Created the initial Project Continuity Memory record.",
-        "Created JsonContinuityRepository for persistent continuity storage.",
-        "Created ContinuityService with get_current() and update_next_action().",
-        "Created update_checkpoint() in ContinuityService.",
-        "Created and verified tests for Project Continuity repository and service behaviour."
-    ],
-    "decisions": [
-        "Project Continuity Memory should be built before adding major external tool integrations.",
-        "ZebraBravo should preserve work history so future sessions do not unnecessarily repeat completed investigations.",
-        "Work should proceed one disciplined step at a time.",
-        "The continuity specification and the living continuity record are separate artifacts.",
-        "Continuity storage should use a repository and service architecture.",
-        "Tests should define expected behaviour before implementation.",
-        "Clean whole-file replacement is preferred over manual line-by-line editing when practical.",
-        "Tests must not modify the live Project Continuity record.",
-        "Zoey's foundational identity and development direction require first-class continuity treatment."
-    ],
-    "rejected": [],
-    "open_questions": [
-        "How should continuity checkpoints be created and retrieved automatically?",
-        "How should ZebraBravo distinguish verified facts, decisions, rejected approaches, and open questions?",
-        "How should ContinuityService support complete checkpoint updates?",
-        "How should ZebraBravo automatically create a continuity checkpoint at appropriate development milestones?",
-        "How should Zoey-specific continuity be stored, validated, updated, and retrieved?",
-        "How should explicit user instructions modify Zoey's durable personality and behaviour?",
-        "How should future visual, audio, and external-tool capabilities reference Zoey's canonical identity?"
-    ],
-    "next_action": "Design and test structured Zoey continuity alongside automatic Project Continuity checkpoint creation and retrieval.",
-    "architecture_notes": [
-        "The Assistant can delegate named capabilities through capability_runtime.",
-        "Intent is represented by a validated contract containing name, capability, operation, and parameters.",
-        "MemoryService uses a service-to-repository architecture for persistent JSON memory.",
-        "Project Continuity Memory follows the same service-to-repository principle without forcing continuity into ordinary memory records.",
-        "ContinuityService currently provides get_current(), update_next_action(), and update_checkpoint().",
-        "The continuity specification defines the categories of information that must survive between sessions.",
-        "The living continuity record stores the current state within those categories.",
-        "Zoey-specific continuity is intended to become a first-class architectural domain rather than being buried in generic project context."
-    ],
-    "important_context": [
-        "ZebraBravo should eventually orchestrate external tools, specialist AI systems, models, and applications without becoming dependent on any single provider or tool.",
-        "Existing open-source software, models, libraries, frameworks, plugins, and APIs should be leveraged when they are the best fit.",
-        "The system should be brave and ambitious but not reckless.",
-        "Project continuity is a foundational requirement because repeated rediscovery of prior work wastes time.",
-        "Important Zoey instructions should be preserved when they materially affect her identity, behaviour, capabilities, or long-term development.",
-        "Zoey should be able to suggest possibilities and pursue ambitious architectural goals while remaining subject to deliberate design and user authority."
+    "future_domains": [
+      "personality",
+      "communication",
+      "visual_identity",
+      "wardrobe_and_presentation",
+      "audio",
+      "multimodal_communication",
+      "tool_knowledge",
+      "creative_tools",
+      "external_tool_orchestration",
+      "self_improvement"
     ]
+  },
+  "completed": [
+    "Established a clean Git working tree synchronized with origin/main.",
+    "Verified the project virtual environment.",
+    "Verified the ZebraBravo test suite: 61 passed and 9 subtests passed.",
+    "Established the modules-based Assistant architecture.",
+    "Established the initial intent contract containing name, capability, operation, and parameters.",
+    "Created the Project Continuity Memory specification.",
+    "Created the initial Project Continuity Memory record.",
+    "Created JsonContinuityRepository for persistent continuity storage.",
+    "Created ContinuityService with get_current() and update_next_action().",
+    "Created update_checkpoint() in ContinuityService.",
+    "Added validation for next_action and checkpoint updates.",
+    "Created and verified tests for Project Continuity repository and service behaviour.",
+    "Established Zoey as a first-class foundational continuity entity.",
+    "Updated the Project Continuity specification to version 2.",
+    "Expanded Project Continuity tests to verify the Zoey continuity foundation.",
+    "Created ZoeyContinuityService with get_current().",
+    "Added controlled Zoey continuity field updates.",
+    "Added tests for Zoey continuity field updates and rejection of unknown fields."
+  ],
+  "decisions": [
+    "Project Continuity Memory should be built before adding major external tool integrations.",
+    "ZebraBravo should preserve work history so future sessions do not unnecessarily repeat completed investigations.",
+    "Work should proceed one disciplined step at a time.",
+    "The continuity specification and the living continuity record are separate artifacts.",
+    "Continuity storage should use a repository and service architecture.",
+    "Tests should define expected behaviour before implementation.",
+    "Clean whole-file replacement is preferred over manual line-by-line editing when practical.",
+    "Tests must not modify the live Project Continuity record.",
+    "Zoey's foundational identity and development direction require first-class continuity treatment.",
+    "Zoey should be able to make suggestions and pursue ambitious possibilities within the project's deliberate design.",
+    "Zoey personality information should be organized as a distinct continuity domain."
+  ],
+  "rejected": [],
+  "open_questions": [
+    "How should continuity checkpoints be created and retrieved automatically?",
+    "How should ZebraBravo distinguish verified facts, decisions, rejected approaches, and open questions?",
+    "How should ContinuityService support complete checkpoint updates?",
+    "How should ZebraBravo automatically create a continuity checkpoint at appropriate development milestones?",
+    "How should Zoey-specific continuity be stored, validated, updated, and retrieved?",
+    "How should explicit user instructions modify Zoey's durable personality and behaviour?",
+    "How should future visual, audio, and external-tool capabilities reference Zoey's canonical identity?",
+    "How should Zoey personality domains be updated without allowing accidental modification of protected identity principles?"
+  ],
+  "next_action": "Design and test structured Zoey personality continuity and controlled domain updates.",
+  "architecture_notes": [
+    "The Assistant can delegate named capabilities through capability_runtime.",
+    "Intent is represented by a validated contract containing name, capability, operation, and parameters.",
+    "MemoryService uses a service-to-repository architecture for persistent JSON memory.",
+    "Project Continuity Memory follows the same service-to-repository principle without forcing continuity into ordinary memory records.",
+    "ContinuityService provides get_current(), update_next_action(), and update_checkpoint().",
+    "The continuity specification defines the categories of information that must survive between sessions.",
+    "The living continuity record stores the current state within those categories.",
+    "Zoey-specific continuity is a first-class architectural domain rather than being buried in generic project context.",
+    "ZoeyContinuityService provides a controlled interface for retrieving and updating existing Zoey continuity fields.",
+    "Future Zoey domains should be introduced deliberately and protected by tests."
+  ],
+  "important_context": [
+    "ZebraBravo should eventually orchestrate external tools, specialist AI systems, models, and applications without becoming dependent on any single provider or tool.",
+    "Existing open-source software, models, libraries, frameworks, plugins, and APIs should be leveraged when they are the best fit.",
+    "The system should be brave and ambitious but not reckless.",
+    "Project continuity is a foundational requirement because repeated rediscovery of prior work wastes time.",
+    "Important Zoey instructions should be preserved when they materially affect her identity, behaviour, capabilities, or long-term development.",
+    "Zoey should be able to suggest possibilities and pursue ambitious architectural goals while remaining subject to deliberate design and user authority.",
+    "The user prefers one step at a time and does not want to be overwhelmed.",
+    "The user prefers navigating to files with File Manager and then opening them in Notepad++.",
+    "The user prefers copying and pasting rather than typing code and strongly prefers complete-file replacement over manual surgery when practical."
+  ]
 }

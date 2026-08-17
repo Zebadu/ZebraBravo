@@ -254,3 +254,75 @@ def test_zoey_personality_domain_is_structured():
         assert "responsible" in personality["traits"]
     finally:
         continuity_file.unlink()
+
+
+def test_zoey_continuity_service_gets_personality():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        personality = service.get_personality()
+
+        assert isinstance(personality, dict)
+        assert "traits" in personality
+        assert "principles" in personality
+        assert "warm" in personality["traits"]
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_continuity_service_adds_personality_trait():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        service.update_personality_trait("curious")
+
+        personality = service.get_personality()
+
+        assert "curious" in personality["traits"]
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_continuity_service_does_not_duplicate_personality_trait():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        service.update_personality_trait("curious")
+        service.update_personality_trait("curious")
+
+        personality = service.get_personality()
+
+        assert personality["traits"].count("curious") == 1
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_continuity_service_rejects_invalid_personality_trait():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        try:
+            service.update_personality_trait("")
+            assert False
+        except ValueError as error:
+            assert str(error) == (
+                "Zoey personality trait cannot be empty."
+            )
+    finally:
+        continuity_file.unlink()

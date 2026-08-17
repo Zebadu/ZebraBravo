@@ -185,3 +185,44 @@ def test_zoey_continuity_service_gets_current():
         )
     finally:
         continuity_file.unlink()
+
+
+def test_zoey_continuity_service_updates_field():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        new_status = "actively_evolving_project_entity"
+
+        service.update_field("status", new_status)
+
+        zoey = service.get_current()
+
+        assert zoey["status"] == new_status
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_continuity_service_rejects_unknown_field():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        try:
+            service.update_field(
+                "unknown_field",
+                "should not be accepted",
+            )
+            assert False
+        except ValueError as error:
+            assert str(error) == (
+                "Unknown Zoey continuity field: unknown_field"
+            )
+    finally:
+        continuity_file.unlink()

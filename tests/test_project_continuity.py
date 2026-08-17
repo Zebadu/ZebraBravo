@@ -10,6 +10,7 @@ sys.path.insert(0, str(MODULES_DIR))
 
 from json_continuity_repository import JsonContinuityRepository
 from continuity_service import ContinuityService
+from zoey_continuity_service import ZoeyContinuityService
 
 
 def create_test_continuity_file(project_root):
@@ -162,5 +163,25 @@ def test_continuity_service_updates_checkpoint():
         continuity = service.get_current()
 
         assert continuity["checkpoint"] == new_checkpoint
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_continuity_service_gets_current():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ZoeyContinuityService(repository)
+
+        zoey = service.get_current()
+
+        assert zoey["status"] == (
+            "foundational_project_entity"
+        )
+        assert "Zoey is the heart and soul of the ZebraBravo project." in (
+            zoey["principles"]
+        )
     finally:
         continuity_file.unlink()

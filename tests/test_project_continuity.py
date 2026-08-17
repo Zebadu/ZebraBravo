@@ -58,7 +58,26 @@ def test_project_continuity_is_valid():
         continuity = json.load(file)
 
     assert continuity["project"] == "ZebraBravo"
-    assert continuity["continuity_version"] == 1
+    assert continuity["continuity_version"] == 2
+
+
+def test_zoey_continuity_foundation_exists():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = (
+        project_root
+        / "data"
+        / "project_continuity_spec.json"
+    )
+
+    with open(continuity_file, "r", encoding="utf-8") as file:
+        continuity = json.load(file)
+
+    assert continuity["zoey"]["status"] == (
+        "foundational_project_entity"
+    )
+    assert "Zoey is the heart and soul of the ZebraBravo project." in (
+        continuity["zoey"]["principles"]
+    )
 
 
 def test_continuity_repository_loads_record():
@@ -70,8 +89,11 @@ def test_continuity_repository_loads_record():
         continuity = repository.load()
 
         assert continuity["project"] == "ZebraBravo"
-        assert continuity["continuity_version"] == 1
+        assert continuity["continuity_version"] == 2
         assert continuity["checkpoint"]["verified_tests"]["passed"] == 61
+        assert continuity["zoey"]["status"] == (
+            "foundational_project_entity"
+        )
     finally:
         continuity_file.unlink()
 
@@ -87,9 +109,12 @@ def test_continuity_service_gets_current_record():
         continuity = service.get_current()
 
         assert continuity["project"] == "ZebraBravo"
-        assert continuity["continuity_version"] == 1
+        assert continuity["continuity_version"] == 2
         assert continuity["next_action"] == (
-            "Improve Project Continuity testing so tests cannot modify the live continuity record."
+            "Design and test structured Zoey continuity alongside automatic Project Continuity checkpoint creation and retrieval."
+        )
+        assert continuity["zoey"]["status"] == (
+            "foundational_project_entity"
         )
     finally:
         continuity_file.unlink()
@@ -110,5 +135,32 @@ def test_continuity_service_updates_next_action():
         continuity = service.get_current()
 
         assert continuity["next_action"] == new_action
+    finally:
+        continuity_file.unlink()
+
+
+def test_continuity_service_updates_checkpoint():
+    project_root = Path(__file__).resolve().parent.parent
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        service = ContinuityService(repository)
+
+        new_checkpoint = {
+            "date": "2026-08-17",
+            "summary": "Checkpoint update verified.",
+            "verified_tests": {
+                "passed": 61,
+                "subtests_passed": 9,
+                "failures": 0,
+            },
+        }
+
+        service.update_checkpoint(new_checkpoint)
+
+        continuity = service.get_current()
+
+        assert continuity["checkpoint"] == new_checkpoint
     finally:
         continuity_file.unlink()

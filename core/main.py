@@ -9,7 +9,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # Allow ZebraBravo to access its modules
 
-sys.path.insert(0, str(PROJECT_ROOT / "Modules"))
+sys.path.insert(0, str(PROJECT_ROOT / "modules"))
 
 from assistant import Assistant
 from json_memory_repository import JsonMemoryRepository
@@ -17,21 +17,21 @@ from memory_service import MemoryService
 
 # Load configuration
 
-CONFIG_FILE = PROJECT_ROOT / "Config" / "config.json"
+CONFIG_FILE = PROJECT_ROOT / "config" / "config.json"
 
 with open(CONFIG_FILE, "r", encoding="utf-8") as file:
     config = json.load(file)
 
 # Create the memory service
 
-MEMORY_FILE = PROJECT_ROOT / "Memory" / "memory.json"
+MEMORY_FILE = PROJECT_ROOT / "memory" / "memory.json"
 memory_repository = JsonMemoryRepository(MEMORY_FILE)
 memory_service = MemoryService(memory_repository)
 memory = memory_service.search("")
 
 # Locate the Logs folder
 
-LOGS_FOLDER = PROJECT_ROOT / "Logs"
+LOGS_FOLDER = PROJECT_ROOT / "logs"
 LOGS_FOLDER.mkdir(exist_ok=True)
 
 # Create a startup log entry

@@ -3,6 +3,7 @@ from pathlib import Path
 from capabilities.context import CapabilityContext
 from capabilities.executor import CapabilityExecutor
 from capabilities.plugins.filesystem import FileSystemCapability
+from capabilities.plugins.truth import TruthCapability
 from capabilities.policy import DefaultCapabilityPolicy
 from capabilities.policy_gateway import PolicyCapabilityGateway
 from capabilities.registry import CapabilityRegistry
@@ -17,10 +18,12 @@ class CapabilityRuntime:
         permissions=(),
         allowed_capabilities=None,
         denied_capabilities=(),
+        dependencies=None,
     ):
         self.registry = CapabilityRegistry()
 
         self.registry.register(FileSystemCapability())
+        self.registry.register(TruthCapability())
 
         self.executor = CapabilityExecutor(self.registry)
 
@@ -40,6 +43,11 @@ class CapabilityRuntime:
                 None
                 if workspace_root is None
                 else Path(workspace_root).resolve()
+            ),
+            dependencies=(
+                {}
+                if dependencies is None
+                else dependencies
             ),
             permissions=frozenset(permissions),
         )

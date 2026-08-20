@@ -24,13 +24,16 @@ class CapabilityRuntimeTests(unittest.TestCase):
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_runtime_registers_filesystem_capability(self):
+    def test_runtime_registers_capabilities(self):
         runtime = CapabilityRuntime(
             workspace_root=self.root,
             permissions={"filesystem.read"},
         )
 
-        self.assertEqual(runtime.capability_names(), ("filesystem",))
+        self.assertEqual(
+            runtime.capability_names(),
+            ("filesystem", "truth"),
+        )
 
     def test_allowed_read_travels_through_full_action_spine(self):
         runtime = CapabilityRuntime(
@@ -72,6 +75,22 @@ class CapabilityRuntimeTests(unittest.TestCase):
 
         self.assertFalse(result.ok)
         self.assertEqual(result.code, "capability_denied")
+
+    def test_runtime_passes_dependencies_into_capability_context(self):
+        truth_service = object()
+
+        runtime = CapabilityRuntime(
+            workspace_root=self.root,
+            permissions={"filesystem.read"},
+            dependencies={
+                "truth_gate": truth_service,
+            },
+        )
+
+        self.assertIs(
+            runtime.context.get_dependency("truth_gate"),
+            truth_service,
+        )
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
 
 from capabilities.runtime import CapabilityRuntime
+from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
 
 
@@ -27,7 +28,7 @@ class IntentRuntimeTests(unittest.TestCase):
     def tearDown(self):
         self.temp_dir.cleanup()
 
-    def test_intent_travels_through_runtime_to_filesystem(self):
+    def test_intent_travels_through_executor_to_filesystem(self):
         intent = self.interpreter.interpret(
             "read_file hello.txt"
         )
@@ -37,13 +38,9 @@ class IntentRuntimeTests(unittest.TestCase):
             permissions={"filesystem.read"},
         )
 
-        result = runtime.execute(
-            intent.capability,
-            {
-                "operation": intent.operation,
-                **intent.parameters,
-            },
-        )
+        executor = IntentExecutor(runtime)
+
+        result = executor.execute(intent)
 
         self.assertTrue(result.ok)
         self.assertEqual(
@@ -64,13 +61,9 @@ class IntentRuntimeTests(unittest.TestCase):
             permissions=set(),
         )
 
-        result = runtime.execute(
-            intent.capability,
-            {
-                "operation": intent.operation,
-                **intent.parameters,
-            },
-        )
+        executor = IntentExecutor(runtime)
+
+        result = executor.execute(intent)
 
         self.assertFalse(result.ok)
 

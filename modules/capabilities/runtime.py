@@ -3,6 +3,7 @@ from pathlib import Path
 from capabilities.context import CapabilityContext
 from capabilities.executor import CapabilityExecutor
 from capabilities.plugins.filesystem import FileSystemCapability
+from capabilities.plugins.git import GitCapability
 from capabilities.plugins.truth import TruthCapability
 from capabilities.policy import DefaultCapabilityPolicy
 from capabilities.policy_gateway import PolicyCapabilityGateway
@@ -23,6 +24,7 @@ class CapabilityRuntime:
         self.registry = CapabilityRegistry()
 
         self.registry.register(FileSystemCapability())
+        self.registry.register(GitCapability())
         self.registry.register(TruthCapability())
 
         self.executor = CapabilityExecutor(self.registry)

@@ -32,7 +32,7 @@ class CapabilityRuntimeTests(unittest.TestCase):
 
         self.assertEqual(
             runtime.capability_names(),
-            ("filesystem", "truth"),
+            ("filesystem", "git", "truth"),
         )
 
     def test_allowed_read_travels_through_full_action_spine(self):

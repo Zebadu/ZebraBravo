@@ -183,8 +183,8 @@ class MemoryManagerCrudTests(MemoryTestCase):
 
     def test_delete_removes_memory_without_reusing_id(self):
         self.assertTrue(self.manager.delete_memory(1))
-        self.assertEqual([item["id"] for item in self.read_memory()["memories"]], [3])
-        self.assertEqual(self.read_memory()["next_id"], 5)
+        self.assertEqual([item["id"] for item in self.manager.load()["memories"]], [3])
+        self.assertEqual(self.manager.load()["next_id"], 5)
         self.assertFalse(self.manager.delete_memory(99))
 
     def test_save_validates_before_overwriting_existing_file(self):
@@ -274,10 +274,25 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/json_memory_repository.py",
                 "modules/memory_manager.py",
                 "modules/memory_service.py",
+                "modules/intent/__init__.py",
+                "modules/intent/contracts.py",
+                "modules/intent/interpreter.py",
+                "modules/intent/executor.py",
+                "modules/capabilities/context.py",
+                "modules/capabilities/contracts.py",
+                "modules/capabilities/executor.py",
+                "modules/capabilities/policy.py",
+                "modules/capabilities/policy_gateway.py",
+                "modules/capabilities/registry.py",
+                "modules/capabilities/runtime.py",
+                "modules/capabilities/plugins/filesystem.py",
+                "modules/capabilities/plugins/git.py",
+                "modules/capabilities/plugins/truth.py",
                 "config/config.json",
             ):
                 source = PROJECT_ROOT / relative_path
                 destination = project_root / relative_path
+                destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(source, destination)
 
             memory = {
@@ -321,3 +336,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 log_lines[0],
                 r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} - ZebraBravo started - Zoey online\.$",
             )
+
+
+if __name__ == "__main__":
+    unittest.main()

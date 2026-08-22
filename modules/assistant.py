@@ -48,6 +48,10 @@ class Assistant:
             self.read_file_command(command)
             return True
 
+        if command.lower() == "list_files" or command.lower().startswith("list_files "):
+            self.list_files_command(command)
+            return True
+
         if command.lower().startswith("remember "):
             content = command[9:].strip()
 
@@ -133,6 +137,27 @@ class Assistant:
 
         print(result.data["content"])
 
+    def list_files_command(self, command):
+        if self.intent_executor is None:
+            print("Capability runtime is not configured.")
+            return
+
+        try:
+            intent = self.intent_interpreter.interpret(command)
+            result = self.intent_executor.execute(intent)
+        except ValueError as error:
+            print(error)
+            return
+
+        if not result.ok:
+            print(result.message)
+            return
+
+        for entry in result.data["entries"]:
+            print(
+                f"{entry['kind']}: {entry['path']}"
+            )
+
     def execute_capability(self, capability_name, request):
         if self.capability_runtime is None:
             raise RuntimeError("Capability runtime is not configured")
@@ -146,6 +171,7 @@ class Assistant:
         print()
         print("Available commands:")
         print("  read_file <path> - Read a file through the controlled capability system")
+        print("  list_files [path] - List a directory through the controlled capability system")
         print("  remember <text>  - Save a new memory")
         print("  search <text>    - Search memories")
         print("  show <id>        - Show a specific memory")

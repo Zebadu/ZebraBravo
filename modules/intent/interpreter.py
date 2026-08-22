@@ -26,4 +26,19 @@ class IntentInterpreter:
                 },
             )
 
+        if action == "list_files":
+            path = "."
+
+            if len(parts) == 2 and parts[1].strip():
+                path = parts[1].strip()
+
+            return Intent(
+                name="list_files",
+                capability="filesystem",
+                operation="list",
+                parameters={
+                    "path": path,
+                },
+            )
+
         raise ValueError(f"Unknown command: {action}")

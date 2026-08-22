@@ -1,6 +1,7 @@
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 
@@ -16,10 +17,19 @@ class CapabilityRuntimeTests(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.root = Path(self.temp_dir.name) / "workspace"
         self.root.mkdir()
+
         (self.root / "hello.txt").write_text(
             "Hello from ZebraBravo.",
             encoding="utf-8",
         )
+
+        self.archive_path = self.root / "sample.zip"
+
+        with zipfile.ZipFile(self.archive_path, "w") as archive:
+            archive.writestr(
+                "youtube/history.txt",
+                "YouTube history test data.",
+            )
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -32,7 +42,7 @@ class CapabilityRuntimeTests(unittest.TestCase):
 
         self.assertEqual(
             runtime.capability_names(),
-            ("filesystem", "git", "truth"),
+            ("archive", "filesystem", "git", "truth"),
         )
 
     def test_allowed_read_travels_through_full_action_spine(self):
@@ -57,6 +67,47 @@ class CapabilityRuntimeTests(unittest.TestCase):
                 "content": "Hello from ZebraBravo.",
             },
         )
+
+    def test_archive_read_travels_through_full_action_spine(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.root,
+            permissions={"archive.read"},
+        )
+
+        result = runtime.execute(
+            "archive",
+            {
+                "operation": "read",
+                "path": "sample.zip",
+                "member": "youtube/history.txt",
+            },
+        )
+
+        self.assertTrue(result.ok)
+        self.assertEqual(
+            result.data,
+            {
+                "path": "sample.zip",
+                "member": "youtube/history.txt",
+                "content": "YouTube history test data.",
+            },
+        )
+
+    def test_archive_requires_explicit_permission(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.root,
+        )
+
+        result = runtime.execute(
+            "archive",
+            {
+                "operation": "list",
+                "path": "sample.zip",
+            },
+        )
+
+        self.assertFalse(result.ok)
+        self.assertEqual(result.code, "permission_denied")
 
     def test_policy_can_block_capability_before_execution(self):
         runtime = CapabilityRuntime(

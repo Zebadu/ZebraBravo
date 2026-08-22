@@ -27,6 +27,32 @@ class IntentInterpreterTests(unittest.TestCase):
             {"path": "hello.txt"},
         )
 
+    def test_interpret_list_files_command_defaults_to_workspace_root(self):
+        intent = self.interpreter.interpret(
+            "list_files"
+        )
+
+        self.assertEqual(intent.name, "list_files")
+        self.assertEqual(intent.capability, "filesystem")
+        self.assertEqual(intent.operation, "list")
+        self.assertEqual(
+            intent.parameters,
+            {"path": "."},
+        )
+
+    def test_interpret_list_files_command_with_path(self):
+        intent = self.interpreter.interpret(
+            "list_files modules"
+        )
+
+        self.assertEqual(intent.name, "list_files")
+        self.assertEqual(intent.capability, "filesystem")
+        self.assertEqual(intent.operation, "list")
+        self.assertEqual(
+            intent.parameters,
+            {"path": "modules"},
+        )
+
     def test_empty_command_is_rejected(self):
         with self.assertRaises(ValueError):
             self.interpreter.interpret("")

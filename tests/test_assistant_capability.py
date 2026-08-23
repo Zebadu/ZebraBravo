@@ -25,6 +25,14 @@ class AssistantCapabilityTests(unittest.TestCase):
             encoding="utf-8",
         )
 
+        notes_dir = self.workspace / "notes"
+        notes_dir.mkdir()
+
+        (notes_dir / "quest.txt").write_text(
+            "The Quest for Truth continues.",
+            encoding="utf-8",
+        )
+
     def tearDown(self):
         self.temp_dir.cleanup()
 
@@ -111,6 +119,120 @@ class AssistantCapabilityTests(unittest.TestCase):
         self.assertEqual(
             output.getvalue(),
             "Capability permission denied.\n",
+        )
+
+    def test_assistant_exposes_development_interface(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+            permissions={"filesystem.read"},
+        )
+
+        memory_service = Mock()
+
+        assistant = Assistant(
+            project_root=self.workspace,
+            memory_service=memory_service,
+            capability_runtime=runtime,
+        )
+
+        result = assistant.execute_development(
+            "project_info"
+        )
+
+        self.assertTrue(result.ok)
+        self.assertEqual(
+            result.data["workspace_root"],
+            self.workspace.as_posix(),
+        )
+
+    def test_assistant_development_read_travels_through_runtime(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+            permissions={"filesystem.read"},
+        )
+
+        memory_service = Mock()
+
+        assistant = Assistant(
+            project_root=self.workspace,
+            memory_service=memory_service,
+            capability_runtime=runtime,
+        )
+
+        result = assistant.execute_development(
+            "read",
+            {
+                "path": "hello.txt",
+            },
+        )
+
+        self.assertTrue(result.ok)
+        self.assertEqual(
+            result.data,
+            {
+                "path": "hello.txt",
+                "content": "Hello from Zoey.",
+            },
+        )
+
+    def test_assistant_development_search_travels_through_runtime(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+            permissions={"filesystem.read"},
+        )
+
+        memory_service = Mock()
+
+        assistant = Assistant(
+            project_root=self.workspace,
+            memory_service=memory_service,
+            capability_runtime=runtime,
+        )
+
+        result = assistant.execute_development(
+            "search",
+            {
+                "query": "Quest",
+            },
+        )
+
+        self.assertTrue(result.ok)
+        self.assertEqual(
+            result.data["matches"],
+            [
+                {
+                    "path": "notes/quest.txt",
+                    "line": 1,
+                    "text": "The Quest for Truth continues.",
+                },
+            ],
+        )
+
+    def test_assistant_development_respects_permission_boundary(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+            permissions=set(),
+        )
+
+        memory_service = Mock()
+
+        assistant = Assistant(
+            project_root=self.workspace,
+            memory_service=memory_service,
+            capability_runtime=runtime,
+        )
+
+        result = assistant.execute_development(
+            "read",
+            {
+                "path": "hello.txt",
+            },
+        )
+
+        self.assertFalse(result.ok)
+        self.assertEqual(
+            result.code,
+            "permission_denied",
         )
 
 

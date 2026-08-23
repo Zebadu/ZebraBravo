@@ -1,6 +1,7 @@
 from memory_manager import MemoryManager
 from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
+from capabilities.development import DevelopmentInterface
 
 
 class Assistant:
@@ -29,6 +30,13 @@ class Assistant:
             self.intent_executor = IntentExecutor(capability_runtime)
         else:
             self.intent_executor = None
+
+        if capability_runtime is not None:
+            self.development_interface = DevelopmentInterface(
+                capability_runtime
+            )
+        else:
+            self.development_interface = None
 
     def process_command(self, command):
         command = command.strip()
@@ -164,6 +172,17 @@ class Assistant:
 
         return self.capability_runtime.execute(
             capability_name,
+            request,
+        )
+
+    def execute_development(self, operation, request=None):
+        """Execute a controlled read-only development operation."""
+
+        if self.development_interface is None:
+            raise RuntimeError("Capability runtime is not configured")
+
+        return self.development_interface.execute(
+            operation,
             request,
         )
 

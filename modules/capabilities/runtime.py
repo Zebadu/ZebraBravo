@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from capabilities.context import CapabilityContext
+from capabilities.development_service import DevelopmentService
 from capabilities.executor import CapabilityExecutor
 from capabilities.plugins.archive import ArchiveCapability
 from capabilities.plugins.filesystem import FileSystemCapability
@@ -56,6 +57,8 @@ class CapabilityRuntime:
             permissions=frozenset(permissions),
         )
 
+        self.development_service = DevelopmentService(self)
+
     def execute(self, capability_name, request):
         """Execute a capability request through policy and execution boundaries."""
         return self.gateway.execute(
@@ -67,3 +70,8 @@ class CapabilityRuntime:
     def capability_names(self):
         """Return the registered capability names."""
         return self.registry.names()
+
+    def execute_development(self, request):
+        """Handle a structured development request."""
+
+        return self.development_service.handle(request)

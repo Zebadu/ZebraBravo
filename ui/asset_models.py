@@ -52,3 +52,8 @@ class VisualAsset:
                 f"Unsupported visual asset approval state: "
                 f"{self.approval_state}"
             )
+
+        if self.active and self.approval_state != "approved":
+            raise ValueError(
+                "Active visual asset must be approved."
+            )

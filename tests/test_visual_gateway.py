@@ -1,6 +1,7 @@
 ﻿import sys
-import pytest
 from pathlib import Path
+
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
@@ -23,6 +24,7 @@ def make_asset(
         file_path="assets/zoey-primary.png",
         source_type="user_artwork",
         provenance="ZebraBravo Visual Gateway",
+        approval_state="approved" if active else "unapproved",
         active=active,
     )
 

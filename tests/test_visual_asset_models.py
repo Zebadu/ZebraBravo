@@ -97,3 +97,55 @@ def test_visual_asset_is_immutable():
 
     with pytest.raises(AttributeError):
         asset.role = "something-else"
+
+
+def test_approved_active_asset_is_accepted():
+    asset = make_asset(
+        approval_state="approved",
+        active=True,
+    )
+
+    assert asset.approval_state == "approved"
+    assert asset.active is True
+
+
+def test_unapproved_active_asset_is_rejected():
+    with pytest.raises(
+        ValueError,
+        match="Active visual asset must be approved",
+    ):
+        make_asset(
+            approval_state="unapproved",
+            active=True,
+        )
+
+
+def test_retired_active_asset_is_rejected():
+    with pytest.raises(
+        ValueError,
+        match="Active visual asset must be approved",
+    ):
+        make_asset(
+            approval_state="retired",
+            active=True,
+        )
+
+
+def test_unapproved_inactive_asset_is_accepted():
+    asset = make_asset(
+        approval_state="unapproved",
+        active=False,
+    )
+
+    assert asset.approval_state == "unapproved"
+    assert asset.active is False
+
+
+def test_retired_inactive_asset_is_accepted():
+    asset = make_asset(
+        approval_state="retired",
+        active=False,
+    )
+
+    assert asset.approval_state == "retired"
+    assert asset.active is False

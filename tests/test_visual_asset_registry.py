@@ -15,6 +15,7 @@ def make_asset(
         file_path="assets/zoey-primary.png",
         source_type="user_artwork",
         provenance="ZebBravo Visual Gateway",
+        approval_state="approved" if active else "unapproved",
         active=active,
     )
 

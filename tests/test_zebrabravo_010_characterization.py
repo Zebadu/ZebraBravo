@@ -1,4 +1,4 @@
-"""Characterisation tests for the active ZebraBravo 0.1.0 implementation.
+﻿"""Characterisation tests for the active ZebraBravo 0.1.0 implementation.
 
 These tests intentionally record current behaviour, including behaviours that
 may be improved during a later refactor.  They use temporary memory stores and
@@ -293,6 +293,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/plugins/filesystem.py",
                 "modules/capabilities/plugins/git.py",
                 "modules/capabilities/plugins/truth.py",
+                "modules/capabilities/plugins/visual.py",
                 "config/config.json",
             ):
                 source = PROJECT_ROOT / relative_path

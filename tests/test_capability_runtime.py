@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import tempfile
 import unittest
 import zipfile
@@ -42,7 +42,7 @@ class CapabilityRuntimeTests(unittest.TestCase):
 
         self.assertEqual(
             runtime.capability_names(),
-            ("archive", "filesystem", "git", "truth"),
+            ("archive", "filesystem", "git", "truth", "visual"),
         )
 
     def test_allowed_read_travels_through_full_action_spine(self):

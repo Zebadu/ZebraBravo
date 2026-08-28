@@ -1,4 +1,4 @@
-import subprocess
+﻿import subprocess
 import sys
 import tempfile
 import unittest
@@ -55,7 +55,7 @@ class DevelopmentInterfaceTests(unittest.TestCase):
         )
         self.assertEqual(
             result.data["capabilities"],
-            ("archive", "filesystem", "git", "truth"),
+            ("archive", "filesystem", "git", "truth", "visual"),
         )
 
     def test_read_travels_through_runtime(self):

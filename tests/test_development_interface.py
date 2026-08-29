@@ -55,7 +55,14 @@ class DevelopmentInterfaceTests(unittest.TestCase):
         )
         self.assertEqual(
             result.data["capabilities"],
-            ("archive", "filesystem", "git", "truth", "visual"),
+            (
+                "archive",
+                "filesystem",
+                "git",
+                "powershell_xray",
+                "truth",
+                "visual",
+            ),
         )
 
     def test_read_travels_through_runtime(self):

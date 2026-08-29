@@ -6,6 +6,7 @@ from capabilities.executor import CapabilityExecutor
 from capabilities.plugins.archive import ArchiveCapability
 from capabilities.plugins.filesystem import FileSystemCapability
 from capabilities.plugins.git import GitCapability
+from capabilities.plugins.powershell_xray import PowerShellXRayCapability
 from capabilities.plugins.truth import TruthCapability
 from capabilities.plugins.visual import VisualCapability
 from capabilities.policy import DefaultCapabilityPolicy
@@ -29,6 +30,7 @@ class CapabilityRuntime:
         self.registry.register(ArchiveCapability())
         self.registry.register(FileSystemCapability())
         self.registry.register(GitCapability())
+        self.registry.register(PowerShellXRayCapability())
         self.registry.register(TruthCapability())
         self.registry.register(VisualCapability())
 

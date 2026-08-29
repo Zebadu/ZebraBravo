@@ -42,7 +42,14 @@ class CapabilityRuntimeTests(unittest.TestCase):
 
         self.assertEqual(
             runtime.capability_names(),
-            ("archive", "filesystem", "git", "truth", "visual"),
+            (
+                "archive",
+                "filesystem",
+                "git",
+                "powershell_xray",
+                "truth",
+                "visual",
+            ),
         )
 
     def test_allowed_read_travels_through_full_action_spine(self):

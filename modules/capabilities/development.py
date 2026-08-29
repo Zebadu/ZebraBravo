@@ -15,6 +15,7 @@ class DevelopmentInterface:
             "git_status",
             "git_log",
             "git_diff",
+            "powershell_xray",
         }
     )
 
@@ -75,10 +76,13 @@ class DevelopmentInterface:
                 request,
             )
 
-        return self._git(
-            "diff",
-            request,
-        )
+        if operation == "git_diff":
+            return self._git(
+                "diff",
+                request,
+            )
+
+        return self._powershell_xray(request)
 
     def _project_info(self):
         context = self.runtime.context
@@ -140,6 +144,17 @@ class DevelopmentInterface:
 
         return self.runtime.execute(
             "git",
+            capability_request,
+        )
+
+    def _powershell_xray(self, request):
+        capability_request = dict(request)
+
+        if "operation" not in capability_request:
+            capability_request["operation"] = "environment"
+
+        return self.runtime.execute(
+            "powershell_xray",
             capability_request,
         )
 

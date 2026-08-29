@@ -1,7 +1,7 @@
 ﻿"""Characterisation tests for the active ZebraBravo 0.1.0 implementation.
 
 These tests intentionally record current behaviour, including behaviours that
-may be improved during a later refactor.  They use temporary memory stores and
+may be improved during a later refactor. They use temporary memory stores and
 never read or alter the project's real memory or log files.
 """
 
@@ -93,7 +93,10 @@ class MemoryManagerValidationTests(MemoryTestCase):
         self.manager.validate_memory(memory)
 
     def test_root_must_be_object(self):
-        with self.assertRaisesRegex(ValueError, "Memory file must contain a JSON object"):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Memory file must contain a JSON object",
+        ):
             self.manager.validate_memory([])
 
     def test_required_top_level_fields_are_validated(self):
@@ -109,28 +112,63 @@ class MemoryManagerValidationTests(MemoryTestCase):
             self.manager.validate_memory({"memories": [], "next_id": "1"})
 
     def test_memory_entry_and_required_fields_are_validated(self):
-        with self.assertRaisesRegex(ValueError, "Each memory must be a JSON object"):
-            self.manager.validate_memory({"memories": ["not an object"], "next_id": 1})
-        with self.assertRaisesRegex(ValueError, "Memory is missing fields: content, created, type"):
-            self.manager.validate_memory({"memories": [{"id": 1}], "next_id": 2})
+        with self.assertRaisesRegex(
+            ValueError,
+            "Each memory must be a JSON object",
+        ):
+            self.manager.validate_memory(
+                {"memories": ["not an object"], "next_id": 1}
+            )
+        with self.assertRaisesRegex(
+            ValueError,
+            "Memory is missing fields: content, created, type",
+        ):
+            self.manager.validate_memory(
+                {"memories": [{"id": 1}], "next_id": 2}
+            )
 
     def test_memory_field_types_and_type_value_are_validated(self):
-        base = {"id": 1, "type": "fact", "created": "", "content": "text"}
+        base = {
+            "id": 1,
+            "type": "fact",
+            "created": "",
+            "content": "text",
+        }
+
         invalid_id = dict(base, id="1")
         with self.assertRaisesRegex(ValueError, "Memory ID must be an integer"):
-            self.manager.validate_memory({"memories": [invalid_id], "next_id": 2})
+            self.manager.validate_memory(
+                {"memories": [invalid_id], "next_id": 2}
+            )
+
         invalid_type = dict(base, type="note")
         with self.assertRaisesRegex(ValueError, "Invalid memory type: note"):
-            self.manager.validate_memory({"memories": [invalid_type], "next_id": 2})
+            self.manager.validate_memory(
+                {"memories": [invalid_type], "next_id": 2}
+            )
+
         invalid_content = dict(base, content=1)
         with self.assertRaisesRegex(ValueError, "Memory content must be text"):
-            self.manager.validate_memory({"memories": [invalid_content], "next_id": 2})
+            self.manager.validate_memory(
+                {"memories": [invalid_content], "next_id": 2}
+            )
 
     def test_current_validator_allows_extra_fields_and_unchecked_metadata(self):
         memory = {
             "memories": [
-                {"id": 1, "type": "fact", "created": None, "content": "", "extra": True},
-                {"id": 1, "type": "fact", "created": "not a date", "content": "duplicate id"},
+                {
+                    "id": 1,
+                    "type": "fact",
+                    "created": None,
+                    "content": "",
+                    "extra": True,
+                },
+                {
+                    "id": 1,
+                    "type": "fact",
+                    "created": "not a date",
+                    "content": "duplicate id",
+                },
             ],
             "next_id": 1,
             "schema_version": 99,
@@ -140,7 +178,9 @@ class MemoryManagerValidationTests(MemoryTestCase):
     def test_load_propagates_missing_file_and_invalid_json_errors(self):
         with self.assertRaises(FileNotFoundError):
             self.manager.load()
+
         self.manager.memory_file.write_text("{", encoding="utf-8")
+
         with self.assertRaises(json.JSONDecodeError):
             self.manager.load()
 
@@ -153,44 +193,80 @@ class MemoryManagerCrudTests(MemoryTestCase):
     def test_add_uses_next_id_preserves_gaps_and_increments_id(self):
         self.manager.add_memory("New note")
         memory = self.read_memory()
-        self.assertEqual([item["id"] for item in memory["memories"]], [1, 3, 5])
+
+        self.assertEqual(
+            [item["id"] for item in memory["memories"]],
+            [1, 3, 5],
+        )
         self.assertEqual(memory["next_id"], 6)
+
         added = memory["memories"][-1]
+
         self.assertEqual(added["type"], "fact")
         self.assertEqual(added["content"], "New note")
-        self.assertRegex(added["created"], r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")
+        self.assertRegex(
+            added["created"],
+            r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$",
+        )
 
     def test_add_accepts_each_supported_type_and_rejects_unsupported_type(self):
         for memory_type in VALID_TYPES:
             self.manager.add_memory(memory_type, memory_type)
-        self.assertEqual({item["type"] for item in self.read_memory()["memories"][-6:]}, VALID_TYPES)
+
+        self.assertEqual(
+            {item["type"] for item in self.read_memory()["memories"][-6:]},
+            VALID_TYPES,
+        )
+
         with self.assertRaisesRegex(ValueError, "Invalid memory type: note"):
             self.manager.add_memory("x", "note")
 
-    def test_search_is_case_insensitive_content_substring_search_in_file_order(self):
-        self.assertEqual([item["id"] for item in self.manager.search("ZEB")], [1, 3])
+    def test_search_is_case_insensitive_content_substring_search_in_file_order(
+        self,
+    ):
+        self.assertEqual(
+            [item["id"] for item in self.manager.search("ZEB")],
+            [1, 3],
+        )
         self.assertEqual(self.manager.search("instruction"), [])
-        self.assertEqual([item["id"] for item in self.manager.search("")], [1, 3])
+        self.assertEqual(
+            [item["id"] for item in self.manager.search("")],
+            [1, 3],
+        )
 
     def test_get_by_id_returns_first_match_or_none(self):
-        self.assertEqual(self.manager.get_by_id(3)["content"], "ZebraBravo is in initial construction.")
+        self.assertEqual(
+            self.manager.get_by_id(3)["content"],
+            "ZebraBravo is in initial construction.",
+        )
         self.assertIsNone(self.manager.get_by_id(99))
 
     def test_update_changes_first_match_and_persists(self):
         self.assertTrue(self.manager.update_memory(3, "Updated"))
-        self.assertEqual(self.manager.get_by_id(3)["content"], "Updated")
+        self.assertEqual(
+            self.manager.get_by_id(3)["content"],
+            "Updated",
+        )
         self.assertFalse(self.manager.update_memory(99, "No change"))
 
     def test_delete_removes_memory_without_reusing_id(self):
         self.assertTrue(self.manager.delete_memory(1))
-        self.assertEqual([item["id"] for item in self.manager.load()["memories"]], [3])
+        self.assertEqual(
+            [item["id"] for item in self.manager.load()["memories"]],
+            [3],
+        )
         self.assertEqual(self.manager.load()["next_id"], 5)
         self.assertFalse(self.manager.delete_memory(99))
 
     def test_save_validates_before_overwriting_existing_file(self):
         original = self.read_memory()
-        with self.assertRaisesRegex(ValueError, "'next_id' must be an integer"):
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "'next_id' must be an integer",
+        ):
             self.manager.save({"memories": [], "next_id": "bad"})
+
         self.assertEqual(self.read_memory(), original)
 
 
@@ -202,35 +278,67 @@ class ActiveAssistantCommandTests(MemoryTestCase):
 
     def run_command(self, command):
         output = io.StringIO()
+
         with redirect_stdout(output):
             result = self.assistant.process_command(command)
+
         return result, output.getvalue()
 
     def test_exit_and_help_are_case_insensitive(self):
         result, output = self.run_command("EXIT")
+
         self.assertFalse(result)
         self.assertEqual(output, "Goodbye, Zeb.\n")
+
         result, output = self.run_command("HeLp")
+
         self.assertTrue(result)
-        self.assertIn("  remember <text>  - Save a new memory\n", output)
-        self.assertIn("  exit             - Exit ZebraBravo\n", output)
+        self.assertIn(
+            "  remember <text>  - Save a new memory\n",
+            output,
+        )
+        self.assertIn(
+            "  exit             - Exit ZebraBravo\n",
+            output,
+        )
 
     def test_remember_uses_fact_type_and_keeps_all_text_after_command(self):
-        result, output = self.run_command("remember project Plan refactor")
+        result, output = self.run_command(
+            "remember project Plan refactor"
+        )
+
         self.assertTrue(result)
         self.assertEqual(output, "Memory saved.\n")
+
         added = self.read_memory()["memories"][-1]
+
         self.assertEqual(added["type"], "fact")
         self.assertEqual(added["content"], "project Plan refactor")
 
     def test_search_show_and_delete_commands(self):
         result, output = self.run_command("search ZEB")
+
         self.assertTrue(result)
-        self.assertEqual(output, "Found 2 memory(s).\n[1] Zeb likes motorcycles.\n[3] ZebraBravo is in initial construction.\n")
+        self.assertEqual(
+            output,
+            "Found 2 memory(s).\n"
+            "[1] Zeb likes motorcycles.\n"
+            "[3] ZebraBravo is in initial construction.\n",
+        )
+
         result, output = self.run_command("show 3")
+
         self.assertTrue(result)
-        self.assertEqual(output, "ID: 3\nType: project\nCreated: 2026-08-13 13:11:29\nContent: ZebraBravo is in initial construction.\n")
+        self.assertEqual(
+            output,
+            "ID: 3\n"
+            "Type: project\n"
+            "Created: 2026-08-13 13:11:29\n"
+            "Content: ZebraBravo is in initial construction.\n",
+        )
+
         result, output = self.run_command("delete 3")
+
         self.assertTrue(result)
         self.assertEqual(output, "Memory deleted.\n")
         self.assertIsNone(self.assistant.memory_manager.get_by_id(3))
@@ -240,21 +348,36 @@ class ActiveAssistantCommandTests(MemoryTestCase):
             "show nope": "Please provide a valid memory ID.\n",
             "delete nope": "Please provide a valid memory ID.\n",
         }
+
         for command, expected in cases.items():
             with self.subTest(command=command):
                 result, output = self.run_command(command)
+
                 self.assertTrue(result)
                 self.assertEqual(output, expected)
 
     def test_unknown_and_command_without_trailing_space_are_unknown(self):
-        for command in ("nonsense", "remember", "remember ", "search", "search ", "show", "delete"):
+        for command in (
+            "nonsense",
+            "remember",
+            "remember ",
+            "search",
+            "search ",
+            "show",
+            "delete",
+        ):
             with self.subTest(command=command):
                 result, output = self.run_command(command)
+
                 self.assertTrue(result)
-                self.assertEqual(output, "Unknown command. Type 'help' for available commands.\n")
+                self.assertEqual(
+                    output,
+                    "Unknown command. Type 'help' for available commands.\n",
+                )
 
     def test_blank_command_returns_none_currently(self):
         result, output = self.run_command("   ")
+
         self.assertIsNone(result)
         self.assertEqual(output, "")
 
@@ -265,6 +388,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
     def test_startup_banner_log_append_and_exit(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
+
             for directory in ("core", "modules", "config", "memory"):
                 (project_root / directory).mkdir()
 
@@ -292,24 +416,44 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/plugins/archive.py",
                 "modules/capabilities/plugins/filesystem.py",
                 "modules/capabilities/plugins/git.py",
+                "modules/capabilities/plugins/powershell_xray.py",
                 "modules/capabilities/plugins/truth.py",
                 "modules/capabilities/plugins/visual.py",
                 "config/config.json",
             ):
                 source = PROJECT_ROOT / relative_path
                 destination = project_root / relative_path
-                destination.parent.mkdir(parents=True, exist_ok=True)
+
+                destination.parent.mkdir(
+                    parents=True,
+                    exist_ok=True,
+                )
+
                 shutil.copy2(source, destination)
 
             memory = {
                 "memories": [
-                    {"id": 1, "type": "fact", "created": "2026-08-12 23:33:27", "content": "First"},
-                    {"id": 3, "type": "project", "created": "2026-08-13 13:11:29", "content": "Second"},
+                    {
+                        "id": 1,
+                        "type": "fact",
+                        "created": "2026-08-12 23:33:27",
+                        "content": "First",
+                    },
+                    {
+                        "id": 3,
+                        "type": "project",
+                        "created": "2026-08-13 13:11:29",
+                        "content": "Second",
+                    },
                 ],
                 "next_id": 5,
             }
-            (project_root / "memory" / "memory.json").write_text(
-                json.dumps(memory), encoding="utf-8"
+
+            (
+                project_root / "memory" / "memory.json"
+            ).write_text(
+                json.dumps(memory),
+                encoding="utf-8",
             )
 
             result = subprocess.run(
@@ -322,7 +466,12 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 check=False,
             )
 
-            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(
+                result.returncode,
+                0,
+                result.stderr,
+            )
+
             self.assertEqual(
                 result.stdout,
                 "ZebraBravo\n"
@@ -332,15 +481,24 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "Type 'help' for available commands.\n\n"
                 "> Goodbye, Zeb.\n",
             )
+
             self.assertEqual(result.stderr, "")
 
             log_file = project_root / "logs" / "zebrabravo.log"
+
             self.assertTrue(log_file.is_file())
-            log_lines = log_file.read_text(encoding="utf-8").splitlines()
+
+            log_lines = log_file.read_text(
+                encoding="utf-8"
+            ).splitlines()
+
             self.assertEqual(len(log_lines), 1)
+
             self.assertRegex(
                 log_lines[0],
-                r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} - ZebraBravo started - Zoey online\.$",
+                r"^\d{4}-\d{2}-\d{2} "
+                r"\d{2}:\d{2}:\d{2} - "
+                r"ZebraBravo started - Zoey online\.$",
             )
 
 

@@ -55,6 +55,12 @@ class PowerShellXRayCapability:
         )
 
     def _environment(self):
+        script = (
+            "$PSVersionTable.PSVersion.ToString(); "
+            "$PSVersionTable.PSEdition; "
+            "$PSVersionTable.CLRVersion.ToString()"
+        )
+
         try:
             completed = subprocess.run(
                 [
@@ -62,7 +68,7 @@ class PowerShellXRayCapability:
                     "-NoProfile",
                     "-NonInteractive",
                     "-Command",
-                    "$PSVersionTable.PSVersion.ToString()",
+                    script,
                 ],
                 capture_output=True,
                 text=True,
@@ -82,7 +88,17 @@ class PowerShellXRayCapability:
                 "Windows PowerShell environment query failed.",
             )
 
-        version = completed.stdout.strip()
+        values = completed.stdout.splitlines()
+
+        if len(values) < 3:
+            return self._failure(
+                "powershell_failed",
+                "Windows PowerShell environment query returned incomplete data.",
+            )
+
+        version = values[0].strip()
+        edition = values[1].strip()
+        clr_version = values[2].strip()
 
         return CapabilityResult(
             ok=True,
@@ -90,6 +106,8 @@ class PowerShellXRayCapability:
                 "operation": "environment",
                 "powershell": "powershell.exe",
                 "version": version,
+                "edition": edition,
+                "clr_version": clr_version,
             },
         )
 

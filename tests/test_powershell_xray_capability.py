@@ -76,6 +76,7 @@ def test_xray_environment_operation_returns_read_only_snapshot():
 
     assert result.ok is True
     assert result.data["operation"] == "environment"
-    assert isinstance(result.data["powershell"], str)
-    assert isinstance(result.data["version"], str)
     assert result.data["powershell"] == "powershell.exe"
+    assert isinstance(result.data["version"], str)
+    assert isinstance(result.data["edition"], str)
+    assert isinstance(result.data["clr_version"], str)

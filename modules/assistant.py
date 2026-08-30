@@ -18,6 +18,7 @@ class Assistant:
 
         self.memory_manager = memory_service
         self.capability_runtime = capability_runtime
+
         self.intent_interpreter = (
             intent_interpreter
             if intent_interpreter is not None
@@ -52,11 +53,17 @@ class Assistant:
             self.show_help()
             return True
 
-        if command.lower() == "read_file" or command.lower().startswith("read_file "):
+        if (
+            command.lower() == "read_file"
+            or command.lower().startswith("read_file ")
+        ):
             self.read_file_command(command)
             return True
 
-        if command.lower() == "list_files" or command.lower().startswith("list_files "):
+        if (
+            command.lower() == "list_files"
+            or command.lower().startswith("list_files ")
+        ):
             self.list_files_command(command)
             return True
 
@@ -168,7 +175,9 @@ class Assistant:
 
     def execute_capability(self, capability_name, request):
         if self.capability_runtime is None:
-            raise RuntimeError("Capability runtime is not configured")
+            raise RuntimeError(
+                "Capability runtime is not configured"
+            )
 
         return self.capability_runtime.execute(
             capability_name,
@@ -176,25 +185,33 @@ class Assistant:
         )
 
     def execute_development(self, operation, request=None):
-        """Execute a controlled read-only development operation."""
+        """Execute a controlled development operation."""
 
         if self.development_interface is None:
-            raise RuntimeError("Capability runtime is not configured")
+            raise RuntimeError(
+                "Capability runtime is not configured"
+            )
 
         return self.development_interface.execute(
             operation,
-            request,
+            request or {},
         )
 
     def show_help(self):
         print()
         print("Available commands:")
-        print("  read_file <path> - Read a file through the controlled capability system")
-        print("  list_files [path] - List a directory through the controlled capability system")
+        print(
+            "  read_file <path> - Read a file through "
+            "the controlled capability system"
+        )
+        print(
+            "  list_files [path] - List a directory through "
+            "the controlled capability system"
+        )
         print("  remember <text>  - Save a new memory")
         print("  search <text>    - Search memories")
         print("  show <id>        - Show a specific memory")
-        print("  delete <id>      - Delete a memory")
+        print("  delete <id>      - Delete a specific memory")
         print("  help             - Show this help")
         print("  exit             - Exit ZebraBravo")
         print()

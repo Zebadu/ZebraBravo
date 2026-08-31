@@ -21,6 +21,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
 
+
 from assistant import Assistant  # noqa: E402
 from memory_manager import MemoryManager  # noqa: E402
 
@@ -87,8 +88,16 @@ class MemoryManagerValidationTests(MemoryTestCase):
     def test_valid_types_are_accepted(self):
         memory = empty_memory()
         memory["memories"] = [
-            {"id": index, "type": memory_type, "created": "", "content": "x"}
-            for index, memory_type in enumerate(sorted(VALID_TYPES), start=1)
+            {
+                "id": index,
+                "type": memory_type,
+                "created": "",
+                "content": "x",
+            }
+            for index, memory_type in enumerate(
+                sorted(VALID_TYPES),
+                start=1,
+            )
         ]
         self.manager.validate_memory(memory)
 
@@ -100,16 +109,34 @@ class MemoryManagerValidationTests(MemoryTestCase):
             self.manager.validate_memory([])
 
     def test_required_top_level_fields_are_validated(self):
-        with self.assertRaisesRegex(ValueError, "missing the 'memories' field"):
+        with self.assertRaisesRegex(
+            ValueError,
+            "missing the 'memories' field",
+        ):
             self.manager.validate_memory({"next_id": 1})
-        with self.assertRaisesRegex(ValueError, "missing the 'next_id' field"):
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "missing the 'next_id' field",
+        ):
             self.manager.validate_memory({"memories": []})
 
     def test_top_level_field_types_are_validated(self):
-        with self.assertRaisesRegex(ValueError, "'memories' must be a list"):
-            self.manager.validate_memory({"memories": {}, "next_id": 1})
-        with self.assertRaisesRegex(ValueError, "'next_id' must be an integer"):
-            self.manager.validate_memory({"memories": [], "next_id": "1"})
+        with self.assertRaisesRegex(
+            ValueError,
+            "'memories' must be a list",
+        ):
+            self.manager.validate_memory(
+                {"memories": {}, "next_id": 1}
+            )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "'next_id' must be an integer",
+        ):
+            self.manager.validate_memory(
+                {"memories": [], "next_id": "1"}
+            )
 
     def test_memory_entry_and_required_fields_are_validated(self):
         with self.assertRaisesRegex(
@@ -119,6 +146,7 @@ class MemoryManagerValidationTests(MemoryTestCase):
             self.manager.validate_memory(
                 {"memories": ["not an object"], "next_id": 1}
             )
+
         with self.assertRaisesRegex(
             ValueError,
             "Memory is missing fields: content, created, type",
@@ -136,24 +164,35 @@ class MemoryManagerValidationTests(MemoryTestCase):
         }
 
         invalid_id = dict(base, id="1")
-        with self.assertRaisesRegex(ValueError, "Memory ID must be an integer"):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Memory ID must be an integer",
+        ):
             self.manager.validate_memory(
                 {"memories": [invalid_id], "next_id": 2}
             )
 
         invalid_type = dict(base, type="note")
-        with self.assertRaisesRegex(ValueError, "Invalid memory type: note"):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Invalid memory type: note",
+        ):
             self.manager.validate_memory(
                 {"memories": [invalid_type], "next_id": 2}
             )
 
         invalid_content = dict(base, content=1)
-        with self.assertRaisesRegex(ValueError, "Memory content must be text"):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Memory content must be text",
+        ):
             self.manager.validate_memory(
                 {"memories": [invalid_content], "next_id": 2}
             )
 
-    def test_current_validator_allows_extra_fields_and_unchecked_metadata(self):
+    def test_current_validator_allows_extra_fields_and_unchecked_metadata(
+        self,
+    ):
         memory = {
             "memories": [
                 {
@@ -209,16 +248,24 @@ class MemoryManagerCrudTests(MemoryTestCase):
             r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$",
         )
 
-    def test_add_accepts_each_supported_type_and_rejects_unsupported_type(self):
+    def test_add_accepts_each_supported_type_and_rejects_unsupported_type(
+        self,
+    ):
         for memory_type in VALID_TYPES:
             self.manager.add_memory(memory_type, memory_type)
 
         self.assertEqual(
-            {item["type"] for item in self.read_memory()["memories"][-6:]},
+            {
+                item["type"]
+                for item in self.read_memory()["memories"][-6:]
+            },
             VALID_TYPES,
         )
 
-        with self.assertRaisesRegex(ValueError, "Invalid memory type: note"):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Invalid memory type: note",
+        ):
             self.manager.add_memory("x", "note")
 
     def test_search_is_case_insensitive_content_substring_search_in_file_order(
@@ -265,7 +312,9 @@ class MemoryManagerCrudTests(MemoryTestCase):
             ValueError,
             "'next_id' must be an integer",
         ):
-            self.manager.save({"memories": [], "next_id": "bad"})
+            self.manager.save(
+                {"memories": [], "next_id": "bad"}
+            )
 
         self.assertEqual(self.read_memory(), original)
 
@@ -302,7 +351,9 @@ class ActiveAssistantCommandTests(MemoryTestCase):
             output,
         )
 
-    def test_remember_uses_fact_type_and_keeps_all_text_after_command(self):
+    def test_remember_uses_fact_type_and_keeps_all_text_after_command(
+        self,
+    ):
         result, output = self.run_command(
             "remember project Plan refactor"
         )
@@ -313,7 +364,10 @@ class ActiveAssistantCommandTests(MemoryTestCase):
         added = self.read_memory()["memories"][-1]
 
         self.assertEqual(added["type"], "fact")
-        self.assertEqual(added["content"], "project Plan refactor")
+        self.assertEqual(
+            added["content"],
+            "project Plan refactor",
+        )
 
     def test_search_show_and_delete_commands(self):
         result, output = self.run_command("search ZEB")
@@ -341,7 +395,9 @@ class ActiveAssistantCommandTests(MemoryTestCase):
 
         self.assertTrue(result)
         self.assertEqual(output, "Memory deleted.\n")
-        self.assertIsNone(self.assistant.memory_manager.get_by_id(3))
+        self.assertIsNone(
+            self.assistant.memory_manager.get_by_id(3)
+        )
 
     def test_invalid_ids_have_current_messages(self):
         cases = {
@@ -389,7 +445,12 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             project_root = Path(temp_dir)
 
-            for directory in ("core", "modules", "config", "memory"):
+            for directory in (
+                "core",
+                "modules",
+                "config",
+                "memory",
+            ):
                 (project_root / directory).mkdir()
 
             for relative_path in (
@@ -415,6 +476,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/development_transport.py",
                 "modules/capabilities/plugins/archive.py",
                 "modules/capabilities/plugins/filesystem.py",
+                "modules/capabilities/plugins/filesystem_write.py",
                 "modules/capabilities/plugins/git.py",
                 "modules/capabilities/plugins/powershell_xray.py",
                 "modules/capabilities/plugins/truth.py",

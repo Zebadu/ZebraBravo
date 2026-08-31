@@ -9,6 +9,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
 
+
 from capabilities.development import DevelopmentInterface  # noqa: E402
 from capabilities.runtime import CapabilityRuntime  # noqa: E402
 
@@ -58,6 +59,7 @@ class DevelopmentInterfaceTests(unittest.TestCase):
             (
                 "archive",
                 "filesystem",
+                "filesystem_write",
                 "git",
                 "powershell_xray",
                 "truth",

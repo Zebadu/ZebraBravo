@@ -4,13 +4,14 @@ from capabilities.contracts import CapabilityResult
 
 
 class DevelopmentInterface:
-    """Read-only orchestration interface for ZebraBravo development access."""
+    """Controlled orchestration interface for ZebraBravo development access."""
 
     _OPERATIONS = frozenset(
         {
             "project_info",
             "list",
             "read",
+            "write",
             "search",
             "git_status",
             "git_log",
@@ -23,7 +24,7 @@ class DevelopmentInterface:
         self.runtime = runtime
 
     def execute(self, operation, request=None):
-        """Execute one approved read-only development operation."""
+        """Execute one approved development operation."""
 
         if not isinstance(operation, str) or not operation:
             return self._failure(
@@ -60,6 +61,9 @@ class DevelopmentInterface:
                 "read",
                 request,
             )
+
+        if operation == "write":
+            return self._write(request)
 
         if operation == "search":
             return self._search(request)
@@ -108,6 +112,15 @@ class DevelopmentInterface:
 
         return self.runtime.execute(
             "filesystem",
+            capability_request,
+        )
+
+    def _write(self, request):
+        capability_request = dict(request)
+        capability_request["operation"] = "write"
+
+        return self.runtime.execute(
+            "filesystem_write",
             capability_request,
         )
 

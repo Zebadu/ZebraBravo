@@ -4,7 +4,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 
@@ -15,7 +14,7 @@ from assistant import Assistant
 
 
 class DevelopmentInterfaceAcceptanceTests(unittest.TestCase):
-    """Acceptance tests for ZebraBravo's controlled read-only development boundary."""
+    """Acceptance tests for ZebraBravo's controlled development boundary."""
 
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -205,24 +204,42 @@ class DevelopmentInterfaceAcceptanceTests(unittest.TestCase):
             result.data["output"],
         )
 
-    def test_development_interface_has_no_write_operation(self):
-        result = self.assistant.execute_development(
-            "write",
+    def test_development_protocol_has_no_write_operation(self):
+        result = self.runtime.execute_development(
             {
-                "path": "README.md",
-                "content": "This must never be written.",
-            },
+                "request_id": "write-boundary-test",
+                "operation": "write",
+                "request": {
+                    "path": "README.md",
+                    "content": "This must never be written.",
+                },
+            }
         )
 
-        self.assertFalse(result.ok)
+        self.assertFalse(result["ok"])
         self.assertEqual(
-            result.code,
+            result["code"],
             "unsupported_operation",
+        )
+        self.assertEqual(
+            result["request_id"],
+            "write-boundary-test",
+        )
+        self.assertEqual(
+            result["operation"],
+            None,
         )
 
         self.assertNotIn(
             "write",
-            self.assistant.development_interface._OPERATIONS,
+            self.runtime.development_service.protocol._OPERATIONS,
+        )
+
+        self.assertEqual(
+            (self.root / "README.md").read_text(
+                encoding="utf-8",
+            ),
+            "# ZebraBravo\n\nControlled development interface.\n",
         )
 
     def test_development_interface_respects_filesystem_permission(self):

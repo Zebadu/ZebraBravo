@@ -9,7 +9,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
 
-
 from capabilities.development import DevelopmentInterface  # noqa: E402
 from capabilities.runtime import CapabilityRuntime  # noqa: E402
 
@@ -173,6 +172,36 @@ class DevelopmentInterfaceTests(unittest.TestCase):
 
         self.assertFalse(result.ok)
         self.assertEqual(result.code, "invalid_request")
+
+    def test_write_requires_confirmation(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.root,
+            permissions={
+                "filesystem.read",
+                "filesystem.write",
+            },
+        )
+        interface = DevelopmentInterface(runtime)
+
+        result = interface.execute(
+            "write",
+            {
+                "path": "written.txt",
+                "content": "Written through ZebraBravo.",
+            },
+        )
+
+        self.assertFalse(result.ok)
+        self.assertEqual(result.code, "confirmation_required")
+        self.assertEqual(
+            result.data,
+            {
+                "side_effect": "write",
+            },
+        )
+        self.assertFalse(
+            (self.root / "written.txt").exists(),
+        )
 
     def test_git_status_requires_git_permission(self):
         runtime = CapabilityRuntime(

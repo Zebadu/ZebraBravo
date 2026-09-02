@@ -1,6 +1,7 @@
 ﻿from pathlib import Path
 
 from capabilities.context import CapabilityContext
+from capabilities.development_bridge import DevelopmentBridge
 from capabilities.development_service import DevelopmentService
 from capabilities.executor import CapabilityExecutor
 from capabilities.plugins.archive import ArchiveCapability
@@ -65,6 +66,10 @@ class CapabilityRuntime:
 
         self.development_service = DevelopmentService(self)
 
+        self.development_bridge = DevelopmentBridge(
+            self.development_service,
+        )
+
     def execute(self, capability_name, request):
         """Execute a capability request through policy and execution boundaries."""
         return self.gateway.execute(
@@ -79,5 +84,4 @@ class CapabilityRuntime:
 
     def execute_development(self, request):
         """Handle a structured development request."""
-
         return self.development_service.handle(request)

@@ -473,6 +473,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/development.py",
                 "modules/capabilities/development_protocol.py",
                 "modules/capabilities/development_service.py",
+                "modules/capabilities/development_bridge.py",
                 "modules/capabilities/development_transport.py",
                 "modules/capabilities/plugins/archive.py",
                 "modules/capabilities/plugins/filesystem.py",

@@ -3,19 +3,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
 
-from capabilities.development_service import DevelopmentService  # noqa: E402
-from capabilities.runtime import CapabilityRuntime  # noqa: E402
+from capabilities.development_service import DevelopmentService
+from capabilities.runtime import CapabilityRuntime
 
 
 class DevelopmentRuntimeTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
-
         self.root = Path(self.temp_dir.name) / "workspace"
         self.root.mkdir()
 
@@ -59,11 +57,27 @@ class DevelopmentRuntimeTests(unittest.TestCase):
             "read",
         )
         self.assertEqual(
-            result["data"],
-            {
-                "path": "hello.txt",
-                "content": "Hello from ZebraBravo.",
-            },
+            result["data"]["path"],
+            "hello.txt",
+        )
+        self.assertEqual(
+            result["data"]["content"],
+            "Hello from ZebraBravo.",
+        )
+        self.assertEqual(
+            result["data"]["provenance"]["workspace_root"],
+            self.root.as_posix(),
+        )
+        self.assertEqual(
+            result["data"]["provenance"]["path"],
+            "hello.txt",
+        )
+        self.assertIsNone(
+            result["data"]["provenance"]["git_log"],
+        )
+        self.assertEqual(
+            result["data"]["provenance"]["git_error"]["code"],
+            "permission_denied",
         )
 
     def test_runtime_development_service_preserves_permission_boundary(self):

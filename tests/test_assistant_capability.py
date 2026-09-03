@@ -6,7 +6,6 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import Mock
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
@@ -168,11 +167,27 @@ class AssistantCapabilityTests(unittest.TestCase):
 
         self.assertTrue(result.ok)
         self.assertEqual(
-            result.data,
-            {
-                "path": "hello.txt",
-                "content": "Hello from Zoey.",
-            },
+            result.data["path"],
+            "hello.txt",
+        )
+        self.assertEqual(
+            result.data["content"],
+            "Hello from Zoey.",
+        )
+        self.assertEqual(
+            result.data["provenance"]["workspace_root"],
+            self.workspace.as_posix(),
+        )
+        self.assertEqual(
+            result.data["provenance"]["path"],
+            "hello.txt",
+        )
+        self.assertIsNone(
+            result.data["provenance"]["git_log"],
+        )
+        self.assertEqual(
+            result.data["provenance"]["git_error"]["code"],
+            "permission_denied",
         )
 
     def test_assistant_development_search_travels_through_runtime(self):

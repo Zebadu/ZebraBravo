@@ -1,4 +1,4 @@
-from typing import Mapping
+﻿from typing import Mapping
 
 from capabilities.contracts import CapabilityResult
 
@@ -24,12 +24,10 @@ class DevelopmentInterface:
         self.runtime = runtime
 
     def execute(self, operation, request=None):
-        """Execute one approved development operation."""
-
         if not isinstance(operation, str) or not operation:
             return self._failure(
                 "invalid_request",
-                "Development operation is required.",
+                "Operation is a required text field.",
             )
 
         if operation not in self._OPERATIONS:
@@ -50,17 +48,8 @@ class DevelopmentInterface:
         if operation == "project_info":
             return self._project_info()
 
-        if operation == "list":
-            return self._filesystem(
-                "list",
-                request,
-            )
-
-        if operation == "read":
-            return self._filesystem(
-                "read",
-                request,
-            )
+        if operation in {"list", "read"}:
+            return self._filesystem(operation, request)
 
         if operation == "write":
             return self._write(request)
@@ -68,23 +57,8 @@ class DevelopmentInterface:
         if operation == "search":
             return self._search(request)
 
-        if operation == "git_status":
-            return self._git(
-                "status",
-                request,
-            )
-
-        if operation == "git_log":
-            return self._git(
-                "log",
-                request,
-            )
-
-        if operation == "git_diff":
-            return self._git(
-                "diff",
-                request,
-            )
+        if operation in {"git_status", "git_log", "git_diff"}:
+            return self._git(operation, request)
 
         return self._powershell_xray(request)
 
@@ -110,35 +84,73 @@ class DevelopmentInterface:
         capability_request = dict(request)
         capability_request["operation"] = operation
 
-        return self.runtime.execute(
+        result = self.runtime.execute(
             "filesystem",
             capability_request,
         )
 
-    def _write(self, request):
-        capability_request = dict(request)
-        capability_request["operation"] = "write"
+        if not result.ok or operation != "read":
+            return result
 
+        context = self.runtime.context
+        workspace_root = context.workspace_root
+
+        provenance = {
+            "workspace_root": (
+                workspace_root.as_posix()
+                if workspace_root is not None
+                else None
+            ),
+            "path": result.data.get("path"),
+        }
+
+        git_result = self.runtime.execute(
+            "git",
+            {
+                "operation": "log",
+                "limit": 1,
+            },
+        )
+
+        if git_result.ok:
+            provenance["git_log"] = git_result.data.get("output", "")
+        else:
+            provenance["git_log"] = None
+            provenance["git_error"] = {
+                "code": git_result.code,
+                "message": git_result.message,
+            }
+
+        data = dict(result.data)
+        data["provenance"] = provenance
+
+        return CapabilityResult(
+            ok=result.ok,
+            data=data,
+            message=result.message,
+            code=result.code,
+        )
+
+    def _write(self, request):
         return self.runtime.execute(
             "filesystem_write",
-            capability_request,
+            dict(request),
         )
 
     def _search(self, request):
         query = request.get("query")
+        path = request.get("path", ".")
 
         if not isinstance(query, str) or not query:
             return self._failure(
                 "invalid_request",
-                "Search query is required.",
+                "Search query is a required text field.",
             )
-
-        path = request.get("path", ".")
 
         if not isinstance(path, str) or not path:
             return self._failure(
                 "invalid_request",
-                "Search path must be text.",
+                "Search path must be a non-empty text field.",
             )
 
         capability_request = dict(request)
@@ -153,7 +165,14 @@ class DevelopmentInterface:
 
     def _git(self, operation, request):
         capability_request = dict(request)
-        capability_request["operation"] = operation
+
+        mapping = {
+            "git_status": "status",
+            "git_log": "log",
+            "git_diff": "diff",
+        }
+
+        capability_request["operation"] = mapping[operation]
 
         return self.runtime.execute(
             "git",

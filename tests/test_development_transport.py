@@ -85,7 +85,7 @@ class DevelopmentTransportTests(unittest.TestCase):
             {
                 "request_id": "transport-read",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }

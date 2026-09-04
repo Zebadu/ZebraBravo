@@ -79,7 +79,7 @@ class DevelopmentProtocol:
                 request_id=request_id,
             )
 
-        payload = request.get("request", {})
+        payload = request.get("payload", {})
 
         if not isinstance(payload, Mapping):
             return self._failure(

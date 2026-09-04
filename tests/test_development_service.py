@@ -65,7 +65,7 @@ class DevelopmentServiceTests(unittest.TestCase):
             {
                 "request_id": "service-read",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }
@@ -116,7 +116,7 @@ class DevelopmentServiceTests(unittest.TestCase):
             {
                 "request_id": "service-denied",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }

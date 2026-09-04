@@ -126,7 +126,7 @@ class DevelopmentProtocolTests(unittest.TestCase):
         result = self.protocol.handle(
             {
                 "operation": "read",
-                "request": "hello.txt",
+                "payload": "hello.txt",
             }
         )
 
@@ -159,7 +159,7 @@ class DevelopmentProtocolTests(unittest.TestCase):
             {
                 "request_id": "read-test",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }
@@ -206,7 +206,7 @@ class DevelopmentProtocolTests(unittest.TestCase):
             {
                 "request_id": "permission-test",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }

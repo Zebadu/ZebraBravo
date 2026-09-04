@@ -41,7 +41,7 @@ class DevelopmentRuntimeTests(unittest.TestCase):
             {
                 "request_id": "runtime-read",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }
@@ -90,7 +90,7 @@ class DevelopmentRuntimeTests(unittest.TestCase):
             {
                 "request_id": "runtime-denied",
                 "operation": "read",
-                "request": {
+                "payload": {
                     "path": "hello.txt",
                 },
             }

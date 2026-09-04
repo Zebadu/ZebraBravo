@@ -476,6 +476,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/development_bridge.py",
                 "modules/capabilities/development_transport.py",
                 "modules/capabilities/plugins/archive.py",
+            "modules/capabilities/plugins/continuity.py",
                 "modules/capabilities/plugins/filesystem.py",
                 "modules/capabilities/plugins/filesystem_write.py",
                 "modules/capabilities/plugins/git.py",

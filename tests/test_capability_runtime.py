@@ -4,11 +4,9 @@ import unittest
 import zipfile
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
-
 
 from capabilities.runtime import CapabilityRuntime  # noqa: E402
 
@@ -45,6 +43,7 @@ class CapabilityRuntimeTests(unittest.TestCase):
             runtime.capability_names(),
             (
                 "archive",
+                "continuity",
                 "filesystem",
                 "filesystem_write",
                 "git",

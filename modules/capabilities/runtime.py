@@ -5,6 +5,7 @@ from capabilities.development_bridge import DevelopmentBridge
 from capabilities.development_service import DevelopmentService
 from capabilities.executor import CapabilityExecutor
 from capabilities.plugins.archive import ArchiveCapability
+from capabilities.plugins.continuity import ContinuityCapability
 from capabilities.plugins.filesystem import FileSystemCapability
 from capabilities.plugins.filesystem_write import FileWriteCapability
 from capabilities.plugins.git import GitCapability
@@ -30,6 +31,7 @@ class CapabilityRuntime:
         self.registry = CapabilityRegistry()
 
         self.registry.register(ArchiveCapability())
+        self.registry.register(ContinuityCapability())
         self.registry.register(FileSystemCapability())
         self.registry.register(FileWriteCapability())
         self.registry.register(GitCapability())

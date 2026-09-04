@@ -56,6 +56,7 @@ class DevelopmentInterfaceTests(unittest.TestCase):
             result.data["capabilities"],
             (
                 "archive",
+                "continuity",
                 "filesystem",
                 "filesystem_write",
                 "git",

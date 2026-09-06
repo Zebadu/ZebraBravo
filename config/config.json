@@ -4,9 +4,10 @@
   "assistant": "Zoey",
   "status": "initial_construction",
   "development_bridge": {
-    "enabled": false,
+    "enabled": true,
     "host": "127.0.0.1",
     "port": 52336,
     "auth_token_env": "ZEBRABRAVO_DEVELOPMENT_TOKEN"
   }
 }
+

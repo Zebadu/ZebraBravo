@@ -459,6 +459,9 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/json_memory_repository.py",
                 "modules/memory_manager.py",
                 "modules/memory_service.py",
+                "modules/zoey_continuity_service.py",
+
+                "modules/json_continuity_repository.py",
                 "modules/intent/__init__.py",
                 "modules/intent/contracts.py",
                 "modules/intent/interpreter.py",
@@ -483,6 +486,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/plugins/powershell_xray.py",
                 "modules/capabilities/plugins/truth.py",
                 "modules/capabilities/plugins/visual.py",
+                "modules/capabilities/plugins/zoey_identity.py",
                 "config/config.json",
             ):
                 source = PROJECT_ROOT / relative_path
@@ -568,3 +572,6 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+

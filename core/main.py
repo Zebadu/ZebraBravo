@@ -15,7 +15,10 @@ sys.path.insert(0, str(PROJECT_ROOT / "modules"))
 from assistant import Assistant
 from capabilities.runtime import CapabilityRuntime
 from json_memory_repository import JsonMemoryRepository
+from json_continuity_repository import JsonContinuityRepository
 from memory_service import MemoryService
+from zoey_continuity_service import ZoeyContinuityService
+
 
 # Load configuration
 
@@ -24,6 +27,7 @@ CONFIG_FILE = PROJECT_ROOT / "config" / "config.json"
 with open(CONFIG_FILE, "r", encoding="utf-8") as file:
     config = json.load(file)
 
+
 # Create the memory service
 
 MEMORY_FILE = PROJECT_ROOT / "memory" / "memory.json"
@@ -31,12 +35,24 @@ memory_repository = JsonMemoryRepository(MEMORY_FILE)
 memory_service = MemoryService(memory_repository)
 memory = memory_service.search("")
 
+
+# Create the Zoey continuity service
+
+CONTINUITY_FILE = PROJECT_ROOT / "data" / "project_continuity.json"
+continuity_repository = JsonContinuityRepository(CONTINUITY_FILE)
+zoey_continuity_service = ZoeyContinuityService(continuity_repository)
+
+
 # Create the controlled capability runtime
 
 capability_runtime = CapabilityRuntime(
     workspace_root=PROJECT_ROOT,
     permissions={"filesystem.read"},
+    dependencies={
+        "zoey_continuity": zoey_continuity_service,
+    },
 )
+
 
 # Start the optional local Development Bridge
 
@@ -65,10 +81,12 @@ if development_bridge_config.get("enabled", False):
     development_bridge.start_background()
     development_bridge_started = True
 
+
 # Locate the Logs folder
 
 LOGS_FOLDER = PROJECT_ROOT / "logs"
 LOGS_FOLDER.mkdir(exist_ok=True)
+
 
 # Create a startup log entry
 
@@ -82,6 +100,7 @@ with open(LOG_FILE, "a", encoding="utf-8") as file:
         f"{config['assistant']} online.\n"
     )
 
+
 # Start ZebraBravo
 
 print(config["name"])
@@ -91,6 +110,7 @@ print(f"Memory loaded: {len(memory)} memories.")
 print()
 print("Type 'help' for available commands.")
 print()
+
 
 # Start the Assistant command interface
 
@@ -116,6 +136,7 @@ try:
             print()
             print("ZebraBravo shutting down.")
             break
+
 finally:
     if development_bridge_started:
         development_bridge.stop()

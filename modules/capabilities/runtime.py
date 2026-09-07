@@ -12,6 +12,7 @@ from capabilities.plugins.git import GitCapability
 from capabilities.plugins.powershell_xray import PowerShellXRayCapability
 from capabilities.plugins.truth import TruthCapability
 from capabilities.plugins.visual import VisualCapability
+from capabilities.plugins.zoey_identity import ZoeyIdentityCapability
 from capabilities.policy import DefaultCapabilityPolicy
 from capabilities.policy_gateway import PolicyCapabilityGateway
 from capabilities.registry import CapabilityRegistry
@@ -38,6 +39,7 @@ class CapabilityRuntime:
         self.registry.register(PowerShellXRayCapability())
         self.registry.register(TruthCapability())
         self.registry.register(VisualCapability())
+        self.registry.register(ZoeyIdentityCapability())
 
         self.executor = CapabilityExecutor(self.registry)
 

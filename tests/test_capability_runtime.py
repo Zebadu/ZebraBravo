@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -50,6 +50,7 @@ class CapabilityRuntimeTests(unittest.TestCase):
                 "powershell_xray",
                 "truth",
                 "visual",
+                "zoey_identity",
             ),
         )
 

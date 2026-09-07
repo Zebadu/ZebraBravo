@@ -1,4 +1,4 @@
-﻿import subprocess
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -63,6 +63,7 @@ class DevelopmentInterfaceTests(unittest.TestCase):
                 "powershell_xray",
                 "truth",
                 "visual",
+                "zoey_identity",
             ),
         )
 

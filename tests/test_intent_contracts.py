@@ -48,6 +48,16 @@ class IntentContractTests(unittest.TestCase):
 
         self.assertEqual(intent.route, "development")
 
+    def test_intent_rejects_unknown_route(self):
+        with self.assertRaises(ValueError):
+            Intent(
+                name="invalid_route",
+                capability="filesystem",
+                operation="read",
+                parameters={"path": "hello.txt"},
+                route="banana",
+            )
+
     def test_intent_is_immutable(self):
         intent = Intent(
             name="read_file",

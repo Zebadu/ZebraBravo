@@ -13,6 +13,9 @@ class IntentExecutor:
             **intent.parameters,
         }
 
+        if intent.route == "development":
+            return self.runtime.execute_development(request)
+
         return self.runtime.execute(
             intent.capability,
             request,

@@ -11,6 +11,7 @@ sys.path.insert(0, str(MODULES_DIR))
 from capabilities.runtime import CapabilityRuntime
 from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
+from intent.contracts import Intent
 
 
 class IntentExecutorTests(unittest.TestCase):
@@ -67,6 +68,63 @@ class IntentExecutorTests(unittest.TestCase):
 
         self.assertFalse(result.ok)
         self.assertEqual(result.code, "permission_denied")
+
+    def test_executor_routes_development_intent_through_development_service(
+        self,
+    ):
+        intent = Intent(
+            name="development_project_info",
+            capability="development",
+            operation="project_info",
+            parameters={},
+            route="development",
+        )
+
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+        )
+
+        executor = IntentExecutor(runtime)
+
+        result = executor.execute(intent)
+
+        self.assertTrue(result["ok"])
+        self.assertEqual(
+            result["operation"],
+            "project_info",
+        )
+        self.assertEqual(
+            result["data"]["workspace_root"],
+            str(self.workspace.resolve()).replace("\\", "/"),
+        )
+
+    def test_executor_does_not_route_normal_capability_through_development(
+        self,
+    ):
+        intent = Intent(
+            name="read_file",
+            capability="filesystem",
+            operation="read",
+            parameters={"path": "hello.txt"},
+        )
+
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+            permissions={"filesystem.read"},
+        )
+
+        executor = IntentExecutor(runtime)
+
+        result = executor.execute(intent)
+
+        self.assertTrue(result.ok)
+        self.assertEqual(
+            result.data,
+            {
+                "path": "hello.txt",
+                "content": "Hello from Zoey.",
+            },
+        )
 
 
 if __name__ == "__main__":

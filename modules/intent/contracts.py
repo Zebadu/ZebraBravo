@@ -10,3 +10,4 @@ class Intent:
     capability: str
     operation: str
     parameters: Mapping[str, Any]
+    route: str = "capability"

@@ -27,6 +27,27 @@ class IntentContractTests(unittest.TestCase):
             {"path": "hello.txt"},
         )
 
+    def test_intent_defaults_to_capability_route(self):
+        intent = Intent(
+            name="read_file",
+            capability="filesystem",
+            operation="read",
+            parameters={"path": "hello.txt"},
+        )
+
+        self.assertEqual(intent.route, "capability")
+
+    def test_intent_accepts_development_route(self):
+        intent = Intent(
+            name="development_project_info",
+            capability="development",
+            operation="project_info",
+            parameters={},
+            route="development",
+        )
+
+        self.assertEqual(intent.route, "development")
+
     def test_intent_is_immutable(self):
         intent = Intent(
             name="read_file",

@@ -2,6 +2,8 @@ from capabilities.contracts import CapabilityResult
 
 
 class PolicyCapabilityGateway:
+    """Enforce capability policy before execution."""
+
     def __init__(self, registry, executor, policy):
         self.registry = registry
         self.executor = executor
@@ -11,9 +13,17 @@ class PolicyCapabilityGateway:
         capability = self.registry.get(capability_name)
 
         if capability is None:
-            return self.executor.execute(capability_name, request, context)
+            return self.executor.execute(
+                capability_name,
+                request,
+                context,
+            )
 
-        decision = self.policy.evaluate(capability.metadata, request, context)
+        decision = self.policy.evaluate(
+            capability.metadata,
+            request,
+            context,
+        )
 
         if not decision.allowed:
             return CapabilityResult(
@@ -21,6 +31,11 @@ class PolicyCapabilityGateway:
                 data=decision.data,
                 message=decision.message,
                 code=decision.code,
+                requires_confirmation=decision.requires_confirmation,
             )
 
-        return self.executor.execute(capability_name, request, context)
+        return self.executor.execute(
+            capability_name,
+            request,
+            context,
+        )

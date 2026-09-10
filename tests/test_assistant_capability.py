@@ -6,9 +6,11 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import Mock
 
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
+
 
 from assistant import Assistant
 from capabilities.runtime import CapabilityRuntime
@@ -85,6 +87,33 @@ class AssistantCapabilityTests(unittest.TestCase):
         with redirect_stdout(output):
             result = assistant.process_command(
                 "read_file hello.txt"
+            )
+
+        self.assertTrue(result)
+        self.assertEqual(
+            output.getvalue(),
+            "Hello from Zoey.\n",
+        )
+
+    def test_inspect_file_command_travels_through_development_intent_path(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.workspace,
+            permissions={"filesystem.read"},
+        )
+
+        memory_service = Mock()
+
+        assistant = Assistant(
+            project_root=self.workspace,
+            memory_service=memory_service,
+            capability_runtime=runtime,
+        )
+
+        output = io.StringIO()
+
+        with redirect_stdout(output):
+            result = assistant.process_command(
+                "inspect_file hello.txt"
             )
 
         self.assertTrue(result)

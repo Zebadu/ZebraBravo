@@ -2,7 +2,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODULES_DIR = PROJECT_ROOT / "modules"
 sys.path.insert(0, str(MODULES_DIR))
@@ -51,6 +50,20 @@ class IntentInterpreterTests(unittest.TestCase):
         self.assertEqual(
             intent.parameters,
             {"path": "modules"},
+        )
+
+    def test_interpret_inspect_file_command(self):
+        intent = self.interpreter.interpret(
+            "inspect_file modules/assistant.py"
+        )
+
+        self.assertEqual(intent.name, "inspect_file")
+        self.assertEqual(intent.capability, "development")
+        self.assertEqual(intent.operation, "read")
+        self.assertEqual(intent.route, "development")
+        self.assertEqual(
+            intent.parameters,
+            {"path": "modules/assistant.py"},
         )
 
     def test_empty_command_is_rejected(self):

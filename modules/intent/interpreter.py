@@ -41,4 +41,18 @@ class IntentInterpreter:
                 },
             )
 
+        if action == "inspect_file":
+            if len(parts) != 2 or not parts[1].strip():
+                raise ValueError("inspect_file requires a path")
+
+            return Intent(
+                name="inspect_file",
+                capability="development",
+                operation="read",
+                parameters={
+                    "path": parts[1].strip(),
+                },
+                route="development",
+            )
+
         raise ValueError(f"Unknown command: {action}")

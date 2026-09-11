@@ -466,6 +466,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/intent/contracts.py",
                 "modules/intent/interpreter.py",
                 "modules/intent/executor.py",
+                "modules/intent/formation.py",
                 "modules/capabilities/context.py",
                 "modules/capabilities/contracts.py",
                 "modules/capabilities/executor.py",
@@ -572,6 +573,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

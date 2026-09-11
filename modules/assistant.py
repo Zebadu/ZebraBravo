@@ -1,6 +1,7 @@
-from memory_manager import MemoryManager
+﻿from memory_manager import MemoryManager
 from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
+from intent.formation import IntentFormation
 from capabilities.development import DevelopmentInterface
 
 
@@ -12,6 +13,7 @@ class Assistant:
         capability_runtime=None,
         intent_interpreter=None,
         intent_executor=None,
+        intent_formation=None,
     ):
         if memory_service is None:
             memory_service = MemoryManager(project_root)
@@ -23,6 +25,12 @@ class Assistant:
             intent_interpreter
             if intent_interpreter is not None
             else IntentInterpreter()
+        )
+
+        self.intent_formation = (
+            intent_formation
+            if intent_formation is not None
+            else IntentFormation()
         )
 
         if intent_executor is not None:
@@ -140,6 +148,22 @@ class Assistant:
 
         print("Unknown command. Type 'help' for available commands.")
         return True
+
+    def form_intent(
+        self,
+        name,
+        capability,
+        operation,
+        parameters=None,
+        route="capability",
+    ):
+        return self.intent_formation.form(
+            name=name,
+            capability=capability,
+            operation=operation,
+            parameters=parameters,
+            route=route,
+        )
 
     def read_file_command(self, command):
         if self.intent_executor is None:

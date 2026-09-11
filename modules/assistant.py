@@ -1,4 +1,4 @@
-from memory_manager import MemoryManager
+﻿from memory_manager import MemoryManager
 from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
 from intent.formation import IntentFormation
@@ -167,6 +167,17 @@ class Assistant:
 
         return True
 
+    def process_request(self, request):
+        if self.intent_reasoner is None:
+            raise RuntimeError("Intent reasoning is not configured.")
+
+        if self.intent_executor is None:
+            raise RuntimeError("Intent execution is not configured.")
+
+        reasoned = self.intent_reasoner.reason(request)
+        intent = self.form_intent(**reasoned)
+        return self.intent_executor.execute(intent)
+
     def form_intent(
         self,
         name,
@@ -286,3 +297,4 @@ class Assistant:
         print("  help             - Show this help")
         print("  exit             - Exit ZebraBravo")
         print()
+

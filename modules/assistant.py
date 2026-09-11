@@ -1,4 +1,4 @@
-﻿from memory_manager import MemoryManager
+from memory_manager import MemoryManager
 from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
 from intent.formation import IntentFormation
@@ -14,6 +14,7 @@ class Assistant:
         intent_interpreter=None,
         intent_executor=None,
         intent_formation=None,
+        intent_reasoner=None,
     ):
         if memory_service is None:
             memory_service = MemoryManager(project_root)
@@ -26,6 +27,8 @@ class Assistant:
             if intent_interpreter is not None
             else IntentInterpreter()
         )
+
+        self.intent_reasoner = intent_reasoner
 
         self.intent_formation = (
             intent_formation
@@ -146,7 +149,22 @@ class Assistant:
 
             return True
 
-        print("Unknown command. Type 'help' for available commands.")
+        if self.intent_reasoner is None:
+            print("Unknown command. Type 'help' for available commands.")
+            return True
+
+        if self.intent_executor is None:
+            print("Intent execution is not configured.")
+            return True
+
+        try:
+            reasoned = self.intent_reasoner.reason(command)
+            intent = self.form_intent(**reasoned)
+            result = self.intent_executor.execute(intent)
+            print(result)
+        except Exception as exc:
+            print(f"Unable to process request: {exc}")
+
         return True
 
     def form_intent(

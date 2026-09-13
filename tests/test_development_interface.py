@@ -1,4 +1,4 @@
-import subprocess
+﻿import subprocess
 import sys
 import tempfile
 import unittest
@@ -66,6 +66,9 @@ class DevelopmentInterfaceTests(unittest.TestCase):
                 "zoey_identity",
             ),
         )
+        self.assertIn("filesystem", result.data)
+        self.assertIn("git_status", result.data)
+        self.assertIn("git_log", result.data)
 
     def test_read_travels_through_runtime(self):
         result = self.interface.execute(

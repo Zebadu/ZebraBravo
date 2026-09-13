@@ -72,11 +72,50 @@ class DevelopmentInterface:
                 "A workspace root is required.",
             )
 
+        filesystem_result = self.runtime.execute(
+            "filesystem",
+            {
+                "operation": "list",
+                "path": ".",
+            },
+        )
+
+        git_status_result = self.runtime.execute(
+            "git",
+            {
+                "operation": "status",
+            },
+        )
+
+        git_log_result = self.runtime.execute(
+            "git",
+            {
+                "operation": "log",
+                "limit": 1,
+            },
+        )
+
+        def snapshot(result):
+            if result.ok:
+                return {
+                    "ok": True,
+                    "data": result.data,
+                }
+
+            return {
+                "ok": False,
+                "code": result.code,
+                "message": result.message,
+            }
+
         return CapabilityResult(
             ok=True,
             data={
                 "workspace_root": root.as_posix(),
                 "capabilities": self.runtime.capability_names(),
+                "filesystem": snapshot(filesystem_result),
+                "git_status": snapshot(git_status_result),
+                "git_log": snapshot(git_log_result),
             },
         )
 
@@ -196,3 +235,4 @@ class DevelopmentInterface:
             message=message,
             code=code,
         )
+

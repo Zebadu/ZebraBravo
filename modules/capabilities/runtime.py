@@ -86,6 +86,10 @@ class CapabilityRuntime:
         """Return the registered capability names."""
         return self.registry.names()
 
+    def capability_inventory(self):
+        """Return metadata for the registered capabilities."""
+        return self.registry.inventory()
+
     def execute_development(self, request):
         """Handle a structured development request."""
         return self.development_service.handle(request)

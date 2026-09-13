@@ -69,6 +69,14 @@ class DevelopmentInterfaceTests(unittest.TestCase):
         self.assertIn("filesystem", result.data)
         self.assertIn("git_status", result.data)
         self.assertIn("git_log", result.data)
+        self.assertIn("capability_inventory", result.data)
+        self.assertTrue(result.data["capability_inventory"])
+        inventory = result.data["capability_inventory"]
+        self.assertIn("name", inventory[0])
+        self.assertIn("description", inventory[0])
+        self.assertIn("version", inventory[0])
+        self.assertIn("side_effect", inventory[0])
+        self.assertIn("required_permissions", inventory[0])
 
     def test_read_travels_through_runtime(self):
         result = self.interface.execute(

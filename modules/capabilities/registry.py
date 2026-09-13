@@ -15,3 +15,20 @@ class CapabilityRegistry:
 
     def names(self):
         return tuple(sorted(self._capabilities))
+
+    def inventory(self):
+        return [
+            {
+                "name": capability.metadata.name,
+                "description": capability.metadata.description,
+                "version": capability.metadata.version,
+                "side_effect": capability.metadata.side_effect,
+                "required_permissions": sorted(
+                    capability.metadata.required_permissions
+                ),
+            }
+            for capability in (
+                self._capabilities[name]
+                for name in sorted(self._capabilities)
+            )
+        ]

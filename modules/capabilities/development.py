@@ -113,6 +113,7 @@ class DevelopmentInterface:
             data={
                 "workspace_root": root.as_posix(),
                 "capabilities": self.runtime.capability_names(),
+                "capability_inventory": self.runtime.capability_inventory(),
                 "filesystem": snapshot(filesystem_result),
                 "git_status": snapshot(git_status_result),
                 "git_log": snapshot(git_log_result),

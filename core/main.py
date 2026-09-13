@@ -10,9 +10,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # Allow ZebraBravo to access its modules
 
-sys.path.insert(0, str(PROJECT_ROOT / "modules"))
+sys.path.insert(0, str(PROJECT_ROOT)); sys.path.insert(0, str(PROJECT_ROOT / 'modules'))
 
-from assistant import Assistant
+from modules.assistant import Assistant
+from intent.simple_reasoner import SimpleIntentReasoner
 from capabilities.runtime import CapabilityRuntime
 from json_memory_repository import JsonMemoryRepository
 from json_continuity_repository import JsonContinuityRepository
@@ -118,6 +119,7 @@ assistant = Assistant(
     PROJECT_ROOT,
     memory_service,
     capability_runtime=capability_runtime,
+    intent_reasoner=SimpleIntentReasoner(),
 )
 
 try:
@@ -140,3 +142,4 @@ try:
 finally:
     if development_bridge_started:
         development_bridge.stop()
+

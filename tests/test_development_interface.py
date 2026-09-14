@@ -78,6 +78,28 @@ class DevelopmentInterfaceTests(unittest.TestCase):
         self.assertIn("side_effect", inventory[0])
         self.assertIn("required_permissions", inventory[0])
 
+        self.assertIn("capability_authorization", result.data)
+
+        authorization = result.data["capability_authorization"]
+
+        filesystem_access = next(
+            item for item in authorization
+            if item["name"] == "filesystem"
+        )
+        self.assertTrue(filesystem_access["authorized"])
+
+        git_access = next(
+            item for item in authorization
+            if item["name"] == "git"
+        )
+        self.assertTrue(git_access["authorized"])
+
+        filesystem_write_access = next(
+            item for item in authorization
+            if item["name"] == "filesystem_write"
+        )
+        self.assertFalse(filesystem_write_access["authorized"])
+
     def test_read_travels_through_runtime(self):
         result = self.interface.execute(
             "read",

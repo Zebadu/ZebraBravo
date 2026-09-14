@@ -108,12 +108,25 @@ class DevelopmentInterface:
                 "message": result.message,
             }
 
+        capability_inventory = self.runtime.capability_inventory()
+        granted_permissions = self.runtime.context.permissions
+        capability_authorization = [
+            {
+                "name": item["name"],
+                "authorized": frozenset(
+                    item["required_permissions"],
+                ).issubset(granted_permissions),
+            }
+            for item in capability_inventory
+        ]
+
         return CapabilityResult(
             ok=True,
             data={
                 "workspace_root": root.as_posix(),
                 "capabilities": self.runtime.capability_names(),
-                "capability_inventory": self.runtime.capability_inventory(),
+                "capability_inventory": capability_inventory,
+                "capability_authorization": capability_authorization,
                 "filesystem": snapshot(filesystem_result),
                 "git_status": snapshot(git_status_result),
                 "git_log": snapshot(git_log_result),

@@ -1,6 +1,5 @@
-from dataclasses import dataclass, field
+﻿from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
-
 
 if TYPE_CHECKING:
     from capabilities.context import CapabilityContext
@@ -17,14 +16,25 @@ class PolicyDecision:
 
 
 class CapabilityPolicy(Protocol):
-    def evaluate(self, metadata: "CapabilityMetadata", request, context: "CapabilityContext") -> PolicyDecision:
+    def evaluate(
+        self,
+        metadata: "CapabilityMetadata",
+        request,
+        context: "CapabilityContext",
+    ) -> PolicyDecision:
         ...
 
 
 class DefaultCapabilityPolicy:
-    def __init__(self, allowed_capabilities=None, denied_capabilities=frozenset()):
+    def __init__(
+        self,
+        allowed_capabilities=None,
+        denied_capabilities=frozenset(),
+    ):
         self.allowed_capabilities = (
-            None if allowed_capabilities is None else frozenset(allowed_capabilities)
+            None
+            if allowed_capabilities is None
+            else frozenset(allowed_capabilities)
         )
         self.denied_capabilities = frozenset(denied_capabilities)
 
@@ -60,7 +70,30 @@ class DefaultCapabilityPolicy:
                 message="Capability allowed by read-only policy.",
             )
 
-        if metadata.side_effect in {"write", "external"}:
+        if metadata.side_effect == "write":
+            authorization = context.get_dependency(
+                "development_authorization"
+            )
+
+            if (
+                authorization is not None
+                and authorization.enabled
+            ):
+                return PolicyDecision(
+                    allowed=True,
+                    code="development_mode_allowed",
+                    message="Write capability allowed by active Development Mode.",
+                )
+
+            return PolicyDecision(
+                allowed=False,
+                code="confirmation_required",
+                message="Capability requires active Development Mode.",
+                requires_confirmation=True,
+                data={"side_effect": metadata.side_effect},
+            )
+
+        if metadata.side_effect == "external":
             return PolicyDecision(
                 allowed=False,
                 code="confirmation_required",

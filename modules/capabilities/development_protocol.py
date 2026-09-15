@@ -19,14 +19,13 @@ class DevelopmentProtocol:
             "git_status",
             "git_log",
             "git_diff",
+            "development_mode",
+            "write",
         }
     )
 
     def __init__(self, development_interface):
-        if not isinstance(
-            development_interface,
-            DevelopmentInterface,
-        ):
+        if not isinstance(development_interface, DevelopmentInterface):
             raise TypeError(
                 "DevelopmentProtocol requires a DevelopmentInterface."
             )
@@ -88,10 +87,26 @@ class DevelopmentProtocol:
                 request_id=request_id,
             )
 
-        result = self.development_interface.execute(
-            operation,
-            payload,
-        )
+        if operation == "development_mode":
+            enabled = payload.get("enabled")
+
+            if enabled is None:
+                result = (
+                    self.development_interface.runtime
+                    .development_service
+                    .development_mode()
+                )
+            else:
+                result = (
+                    self.development_interface.runtime
+                    .development_service
+                    .set_development_mode(enabled)
+                )
+        else:
+            result = self.development_interface.execute(
+                operation,
+                payload,
+            )
 
         return self._response(
             request_id=request_id,
@@ -124,3 +139,4 @@ class DevelopmentProtocol:
     @staticmethod
     def _new_request_id():
         return uuid4().hex
+

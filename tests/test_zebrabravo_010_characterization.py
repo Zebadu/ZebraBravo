@@ -476,6 +476,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/registry.py",
                 "modules/capabilities/runtime.py",
                 "modules/capabilities/development.py",
+            "modules/capabilities/development_authorization.py",
                 "modules/capabilities/development_protocol.py",
                 "modules/capabilities/development_service.py",
                 "modules/capabilities/development_bridge.py",

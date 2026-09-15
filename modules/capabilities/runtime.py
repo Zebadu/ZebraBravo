@@ -1,6 +1,7 @@
 ﻿from pathlib import Path
 
 from capabilities.context import CapabilityContext
+from capabilities.development_authorization import DevelopmentAuthorization
 from capabilities.development_bridge import DevelopmentBridge
 from capabilities.development_service import DevelopmentService
 from capabilities.executor import CapabilityExecutor
@@ -54,17 +55,24 @@ class CapabilityRuntime:
             self.policy,
         )
 
+        self.development_authorization = DevelopmentAuthorization()
+
+        runtime_dependencies = (
+            {}
+            if dependencies is None
+            else dict(dependencies)
+        )
+        runtime_dependencies["development_authorization"] = (
+            self.development_authorization
+        )
+
         self.context = CapabilityContext(
             workspace_root=(
                 None
                 if workspace_root is None
                 else Path(workspace_root).resolve()
             ),
-            dependencies=(
-                {}
-                if dependencies is None
-                else dependencies
-            ),
+            dependencies=runtime_dependencies,
             permissions=frozenset(permissions),
         )
 

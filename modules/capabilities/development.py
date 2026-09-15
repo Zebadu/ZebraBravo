@@ -1,4 +1,4 @@
-﻿from typing import Mapping
+from typing import Mapping
 
 from capabilities.contracts import CapabilityResult
 
@@ -185,9 +185,11 @@ class DevelopmentInterface:
         )
 
     def _write(self, request):
+        capability_request = dict(request)
+        capability_request["operation"] = "write"
         return self.runtime.execute(
             "filesystem_write",
-            dict(request),
+            capability_request,
         )
 
     def _search(self, request):

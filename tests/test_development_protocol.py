@@ -226,11 +226,21 @@ class DevelopmentProtocolTests(unittest.TestCase):
             "permission_denied",
         )
 
-    def test_protocol_has_no_write_operation(self):
-        self.assertNotIn(
-            "write",
-            DevelopmentProtocol._OPERATIONS,
+    def test_protocol_write_operation_requires_permission(self):
+        result = self.protocol.handle(
+            {
+                "request_id": "write-boundary-test",
+                "operation": "write",
+                "payload": {
+                    "path": "hello.txt",
+                    "content": "This must never be written.",
+                },
+            }
         )
+
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["code"], "permission_denied")
+        self.assertEqual(result["request_id"], "write-boundary-test")
 
     def test_protocol_has_no_delete_operation(self):
         self.assertNotIn(

@@ -204,7 +204,9 @@ class DevelopmentInterfaceAcceptanceTests(unittest.TestCase):
             result.data["output"],
         )
 
-    def test_development_protocol_has_no_write_operation(self):
+    def test_development_protocol_write_requires_permission(self):
+        target = self.root / "README.md"
+
         result = self.runtime.execute_development(
             {
                 "request_id": "write-boundary-test",
@@ -219,7 +221,7 @@ class DevelopmentInterfaceAcceptanceTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertEqual(
             result["code"],
-            "unsupported_operation",
+            "permission_denied",
         )
         self.assertEqual(
             result["request_id"],
@@ -227,18 +229,10 @@ class DevelopmentInterfaceAcceptanceTests(unittest.TestCase):
         )
         self.assertEqual(
             result["operation"],
-            None,
-        )
-
-        self.assertNotIn(
             "write",
-            self.runtime.development_service.protocol._OPERATIONS,
         )
-
         self.assertEqual(
-            (self.root / "README.md").read_text(
-                encoding="utf-8",
-            ),
+            target.read_text(encoding="utf-8"),
             "# ZebraBravo\n\nControlled development interface.\n",
         )
 

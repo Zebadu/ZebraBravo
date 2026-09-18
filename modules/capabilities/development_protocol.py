@@ -21,6 +21,7 @@ class DevelopmentProtocol:
             "git_diff",
             "development_mode",
             "write",
+            "test",
         }
     )
 

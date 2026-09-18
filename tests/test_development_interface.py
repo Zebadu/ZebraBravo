@@ -57,10 +57,12 @@ class DevelopmentInterfaceTests(unittest.TestCase):
             (
                 "archive",
                 "continuity",
+                "desktop",
                 "filesystem",
                 "filesystem_write",
                 "git",
                 "powershell_xray",
+                "test",
                 "truth",
                 "visual",
                 "zoey_identity",

@@ -242,6 +242,49 @@ class DevelopmentProtocolTests(unittest.TestCase):
         self.assertEqual(result["code"], "permission_denied")
         self.assertEqual(result["request_id"], "write-boundary-test")
 
+    def test_protocol_routes_test_through_development_mode(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.root,
+            permissions={
+                "test.run",
+            },
+        )
+
+        interface = DevelopmentInterface(runtime)
+        protocol = DevelopmentProtocol(interface)
+
+        blocked = protocol.handle(
+            {
+                "request_id": "test-development-mode-off",
+                "operation": "test",
+            }
+        )
+
+        self.assertFalse(blocked["ok"])
+        self.assertEqual(
+            blocked["code"],
+            "confirmation_required",
+        )
+
+        runtime.development_authorization.enable()
+
+        reached = protocol.handle(
+            {
+                "request_id": "test-development-mode-on",
+                "operation": "test",
+            }
+        )
+
+        self.assertFalse(reached["ok"])
+        self.assertEqual(
+            reached["code"],
+            "test_unavailable",
+        )
+        self.assertEqual(
+            reached["operation"],
+            "test",
+        )
+
     def test_protocol_has_no_delete_operation(self):
         self.assertNotIn(
             "delete",

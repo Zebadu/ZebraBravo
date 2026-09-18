@@ -48,7 +48,7 @@ zoey_continuity_service = ZoeyContinuityService(continuity_repository)
 
 capability_runtime = CapabilityRuntime(
     workspace_root=PROJECT_ROOT,
-    permissions={"filesystem.read", "filesystem.write"},
+    permissions={"filesystem.read", "filesystem.write", "test.run"},
     dependencies={
         "zoey_continuity": zoey_continuity_service,
     },

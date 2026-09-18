@@ -93,6 +93,29 @@ class DefaultCapabilityPolicy:
                 data={"side_effect": metadata.side_effect},
             )
 
+        if metadata.side_effect == "test":
+            authorization = context.get_dependency(
+                "development_authorization"
+            )
+
+            if (
+                authorization is not None
+                and authorization.enabled
+            ):
+                return PolicyDecision(
+                    allowed=True,
+                    code="development_mode_allowed",
+                    message="Test capability allowed by active Development Mode.",
+                )
+
+            return PolicyDecision(
+                allowed=False,
+                code="confirmation_required",
+                message="Test capability requires active Development Mode.",
+                requires_confirmation=True,
+                data={"side_effect": metadata.side_effect},
+            )
+
         if metadata.side_effect == "external":
             return PolicyDecision(
                 allowed=False,

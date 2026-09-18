@@ -17,6 +17,7 @@ class DevelopmentInterface:
             "git_log",
             "git_diff",
             "powershell_xray",
+        "test",
         }
     )
 
@@ -60,7 +61,20 @@ class DevelopmentInterface:
         if operation in {"git_status", "git_log", "git_diff"}:
             return self._git(operation, request)
 
+
+        if operation == "test":
+            return self._test(request)
+
         return self._powershell_xray(request)
+
+    def _test(self, request):
+        capability_request = dict(request)
+        capability_request["operation"] = "pytest"
+
+        return self.runtime.execute(
+            "test",
+            capability_request,
+        )
 
     def _project_info(self):
         context = self.runtime.context

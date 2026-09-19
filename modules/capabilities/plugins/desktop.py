@@ -1,4 +1,5 @@
 from capabilities.contracts import CapabilityMetadata, CapabilityResult
+from capabilities.visual_observation import VisualObservation
 
 
 class DesktopCapability:
@@ -19,4 +20,12 @@ class DesktopCapability:
                 code="context_required",
             )
 
-        return desktop_gateway.execute(request)
+        result = desktop_gateway.execute(request)
+
+        if request.get("operation") == "capture" and result.ok:
+            return CapabilityResult(
+                ok=True,
+                data=VisualObservation.from_capture(result.data),
+            )
+
+        return result

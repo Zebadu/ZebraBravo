@@ -1,4 +1,4 @@
-﻿"""Characterisation tests for the active ZebraBravo 0.1.0 implementation.
+"""Characterisation tests for the active ZebraBravo 0.1.0 implementation.
 
 These tests intentionally record current behaviour, including behaviours that
 may be improved during a later refactor. They use temporary memory stores and
@@ -477,6 +477,8 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/runtime.py",
                 "modules/capabilities/development.py",
             "modules/capabilities/plugins/desktop.py",
+            "modules/capabilities/plugins/windows_diagnostics.py",
+            "modules/capabilities/visual_observation.py",
             "modules/capabilities/plugins/test.py",
             "modules/capabilities/development_authorization.py",
                 "modules/capabilities/development_protocol.py",

@@ -17,6 +17,7 @@ class DevelopmentInterface:
             "git_log",
             "git_diff",
             "powershell_xray",
+            "windows_diagnostics",
         "test",
         }
     )
@@ -61,6 +62,9 @@ class DevelopmentInterface:
         if operation in {"git_status", "git_log", "git_diff"}:
             return self._git(operation, request)
 
+
+        if operation == "windows_diagnostics":
+            return self._windows_diagnostics(request)
 
         if operation == "test":
             return self._test(request)
@@ -248,12 +252,20 @@ class DevelopmentInterface:
             capability_request,
         )
 
-    def _powershell_xray(self, request):
+    def _windows_diagnostics(self, request):
         capability_request = dict(request)
 
         if "operation" not in capability_request:
-            capability_request["operation"] = "environment"
+            capability_request["operation"] = "software_lookup"
 
+        return self.runtime.execute(
+            "windows_diagnostics",
+            capability_request,
+        )
+    def _powershell_xray(self, request):
+        capability_request = dict(request)
+        if "operation" not in capability_request:
+            capability_request["operation"] = "environment"
         return self.runtime.execute(
             "powershell_xray",
             capability_request,
@@ -265,4 +277,3 @@ class DevelopmentInterface:
             message=message,
             code=code,
         )
-

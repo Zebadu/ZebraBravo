@@ -65,6 +65,7 @@ class DevelopmentInterfaceTests(unittest.TestCase):
                 "test",
                 "truth",
                 "visual",
+                "windows_diagnostics",
                 "zoey_identity",
             ),
         )

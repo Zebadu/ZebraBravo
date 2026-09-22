@@ -5,3 +5,5 @@ memory/
 __pycache__/
 *.pyc
 .venv/
+
+comfyui.log

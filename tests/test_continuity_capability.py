@@ -131,6 +131,46 @@ class ContinuityCapabilityTests(unittest.TestCase):
         self.assertFalse(result.ok)
         self.assertEqual(result.code, "confirmation_required")
         self.assertTrue(result.requires_confirmation)
+    def test_continuity_update_checkpoint_succeeds_in_development_mode(self):
+        runtime = CapabilityRuntime(
+            workspace_root=Path(self.temp_dir.name),
+            permissions={"continuity.read", "continuity.write"},
+            dependencies={"continuity": self.continuity_service},
+        )
+
+        authorization = runtime.development_service.set_development_mode(True)
+        self.assertTrue(authorization.ok)
+
+        checkpoint = {
+            "date": "2026-09-23",
+            "summary": "Governed write test.",
+            "verified_tests": {
+                "passed": 28,
+                "subtests_passed": 28,
+                "failures": 0,
+            },
+        }
+
+        result = runtime.execute(
+            "continuity",
+            {
+                "operation": "update_checkpoint",
+                "checkpoint": checkpoint,
+            },
+        )
+
+        self.assertTrue(result.ok)
+        self.assertEqual(result.data["operation"], "update_checkpoint")
+
+        read_back = runtime.execute(
+            "continuity",
+            {
+                "operation": "get_current",
+            },
+        )
+
+        self.assertTrue(read_back.ok)
+        self.assertEqual(read_back.data["checkpoint"], checkpoint)
     def test_continuity_capability_requires_dependency(self):
         runtime = CapabilityRuntime(
             workspace_root=Path(self.temp_dir.name),

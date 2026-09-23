@@ -1,10 +1,5 @@
-﻿from dataclasses import dataclass
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
-
-if TYPE_CHECKING:
-    from capabilities.context import CapabilityContext
-    from capabilities.contracts import CapabilityMetadata
-
 
 @dataclass(frozen=True)
 class PolicyDecision:
@@ -14,36 +9,23 @@ class PolicyDecision:
     requires_confirmation: bool = False
     data: object | None = None
 
-
 class CapabilityPolicy(Protocol):
-    def evaluate(
-        self,
-        metadata: "CapabilityMetadata",
-        request,
-        context: "CapabilityContext",
-    ) -> PolicyDecision:
+    def evaluate(self, metadata, request, context) -> PolicyDecision:
         ...
 
-
 class DefaultCapabilityPolicy:
-    def __init__(
-        self,
-        allowed_capabilities=None,
-        denied_capabilities=frozenset(),
-    ):
+    def __init__(self, allowed_capabilities=None, denied_capabilities=frozenset()):
         self.allowed_capabilities = (
-            None
-            if allowed_capabilities is None
-            else frozenset(allowed_capabilities)
+            None if allowed_capabilities is None else frozenset(allowed_capabilities)
         )
         self.denied_capabilities = frozenset(denied_capabilities)
 
     def evaluate(self, metadata, request, context):
         if metadata.name in self.denied_capabilities:
             return PolicyDecision(
-                allowed=False,
-                code="capability_denied",
-                message=f"Capability denied by policy: {metadata.name}",
+                False,
+                "capability_denied",
+                f"Capability denied by policy: {metadata.name}",
             )
 
         if (
@@ -51,82 +33,85 @@ class DefaultCapabilityPolicy:
             and metadata.name not in self.allowed_capabilities
         ):
             return PolicyDecision(
-                allowed=False,
-                code="capability_not_allowed",
-                message=f"Capability is not allowed by policy: {metadata.name}",
+                False,
+                "capability_not_allowed",
+                f"Capability is not allowed by policy: {metadata.name}",
             )
 
-        if not metadata.required_permissions.issubset(context.permissions):
+        operation = getattr(request, "operation", None)
+        if operation is None and isinstance(request, dict):
+            operation = request.get("operation")
+
+        operation_permissions = metadata.operation_permissions.get(
+            operation,
+            frozenset(),
+        )
+        effective_permissions = (
+            metadata.required_permissions | operation_permissions
+        )
+
+        if not effective_permissions.issubset(context.permissions):
             return PolicyDecision(
-                allowed=False,
-                code="permission_denied",
-                message="Capability permission denied.",
+                False,
+                "permission_denied",
+                "Capability permission denied.",
             )
 
-        if metadata.side_effect == "read":
+        side_effect = metadata.operation_side_effects.get(
+            operation,
+            metadata.side_effect,
+        )
+
+        if side_effect == "read":
             return PolicyDecision(
-                allowed=True,
-                code="allowed",
-                message="Capability allowed by read-only policy.",
+                True,
+                "allowed",
+                "Capability allowed by read-only policy.",
             )
 
-        if metadata.side_effect == "write":
-            authorization = context.get_dependency(
-                "development_authorization"
-            )
-
-            if (
-                authorization is not None
-                and authorization.enabled
-            ):
+        if side_effect == "write":
+            authorization = context.get_dependency("development_authorization")
+            if authorization is not None and authorization.enabled:
                 return PolicyDecision(
-                    allowed=True,
-                    code="development_mode_allowed",
-                    message="Write capability allowed by active Development Mode.",
+                    True,
+                    "development_mode_allowed",
+                    "Write capability allowed by active Development Mode.",
                 )
-
             return PolicyDecision(
-                allowed=False,
-                code="confirmation_required",
-                message="Capability requires active Development Mode.",
-                requires_confirmation=True,
-                data={"side_effect": metadata.side_effect},
+                False,
+                "confirmation_required",
+                "Capability requires active Development Mode.",
+                True,
+                {"side_effect": side_effect},
             )
 
-        if metadata.side_effect == "test":
-            authorization = context.get_dependency(
-                "development_authorization"
-            )
-
-            if (
-                authorization is not None
-                and authorization.enabled
-            ):
+        if side_effect == "test":
+            authorization = context.get_dependency("development_authorization")
+            if authorization is not None and authorization.enabled:
                 return PolicyDecision(
-                    allowed=True,
-                    code="development_mode_allowed",
-                    message="Test capability allowed by active Development Mode.",
+                    True,
+                    "development_mode_allowed",
+                    "Test capability allowed by active Development Mode.",
                 )
-
             return PolicyDecision(
-                allowed=False,
-                code="confirmation_required",
-                message="Test capability requires active Development Mode.",
-                requires_confirmation=True,
-                data={"side_effect": metadata.side_effect},
+                False,
+                "confirmation_required",
+                "Test capability requires active Development Mode.",
+                True,
+                {"side_effect": side_effect},
             )
 
-        if metadata.side_effect == "external":
+        if side_effect == "external":
             return PolicyDecision(
-                allowed=False,
-                code="confirmation_required",
-                message="Capability requires future user confirmation.",
-                requires_confirmation=True,
-                data={"side_effect": metadata.side_effect},
+                False,
+                "confirmation_required",
+                "External capability requires explicit confirmation.",
+                True,
+                {"side_effect": side_effect},
             )
 
         return PolicyDecision(
-            allowed=False,
-            code="policy_invalid_metadata",
-            message=f"Unsupported capability side effect: {metadata.side_effect}",
+            False,
+            "policy_invalid_metadata",
+            f"Unsupported capability side effect: {side_effect}",
         )

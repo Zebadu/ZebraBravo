@@ -18,6 +18,7 @@ from capabilities.runtime import CapabilityRuntime
 from json_memory_repository import JsonMemoryRepository
 from json_continuity_repository import JsonContinuityRepository
 from memory_service import MemoryService
+from continuity_service import ContinuityService
 from zoey_continuity_service import ZoeyContinuityService
 
 
@@ -41,6 +42,7 @@ memory = memory_service.search("")
 
 CONTINUITY_FILE = PROJECT_ROOT / "data" / "project_continuity.json"
 continuity_repository = JsonContinuityRepository(CONTINUITY_FILE)
+continuity_service = ContinuityService(continuity_repository)
 zoey_continuity_service = ZoeyContinuityService(continuity_repository)
 
 
@@ -48,8 +50,16 @@ zoey_continuity_service = ZoeyContinuityService(continuity_repository)
 
 capability_runtime = CapabilityRuntime(
     workspace_root=PROJECT_ROOT,
-    permissions={"filesystem.read", "filesystem.write", "test.run"},
+    permissions={
+        "filesystem.read",
+        "filesystem.write",
+        "git.read",
+        "test.run",
+        "continuity.read",
+        "continuity.write",
+    },
     dependencies={
+        "continuity": continuity_service,
         "zoey_continuity": zoey_continuity_service,
     },
 )
@@ -142,4 +152,8 @@ try:
 finally:
     if development_bridge_started:
         development_bridge.stop()
+
+
+
+
 

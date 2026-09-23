@@ -11,6 +11,8 @@ class CapabilityMetadata:
     version: str = "0.1.0"
     side_effect: str = "read"
     required_permissions: FrozenSet[str] = field(default_factory=frozenset)
+    operation_side_effects: Mapping[str, str] = field(default_factory=dict)
+    operation_permissions: Mapping[str, FrozenSet[str]] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

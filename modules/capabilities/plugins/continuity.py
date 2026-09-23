@@ -8,6 +8,8 @@ class ContinuityCapability:
         name="continuity",
         description="Controlled read access to ZebraBravo's Continuity record.",
         required_permissions=frozenset({"continuity.read"}),
+        operation_side_effects={"get_current": "read", "update_checkpoint": "write"},
+        operation_permissions={"update_checkpoint": frozenset({"continuity.write"})},
     )
 
     def execute(self, request, context):
@@ -33,6 +35,26 @@ class ContinuityCapability:
                 "Operation is required.",
             )
 
+        if operation == "update_checkpoint":
+            if "continuity.write" not in context.permissions:
+                return self._failure(
+                    "permission_denied",
+                    "Continuity write permission is required.",
+                )
+
+            checkpoint = request.get("checkpoint")
+            if not isinstance(checkpoint, dict):
+                return self._failure(
+                    "invalid_request",
+                    "Checkpoint must be an object.",
+                )
+
+            continuity.update_checkpoint(checkpoint)
+            return CapabilityResult(
+                ok=True,
+                data={"operation": "update_checkpoint"},
+            )
+
         if operation == "get_current":
             return CapabilityResult(
                 ok=True,
@@ -50,3 +72,4 @@ class ContinuityCapability:
             message=message,
             code=code,
         )
+

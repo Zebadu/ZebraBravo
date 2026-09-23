@@ -105,6 +105,32 @@ class ContinuityCapabilityTests(unittest.TestCase):
             "Test Continuity capability.",
         )
 
+    def test_continuity_update_checkpoint_requires_development_mode(self):
+        runtime = CapabilityRuntime(
+            workspace_root=Path(self.temp_dir.name),
+            permissions={"continuity.read", "continuity.write"},
+            dependencies={"continuity": self.continuity_service},
+        )
+
+        result = runtime.execute(
+            "continuity",
+            {
+                "operation": "update_checkpoint",
+                "checkpoint": {
+                    "date": "2026-09-22",
+                    "summary": "Governance test.",
+                    "verified_tests": {
+                        "passed": 0,
+                        "subtests_passed": 0,
+                        "failures": 0,
+                    },
+                },
+            },
+        )
+
+        self.assertFalse(result.ok)
+        self.assertEqual(result.code, "confirmation_required")
+        self.assertTrue(result.requires_confirmation)
     def test_continuity_capability_requires_dependency(self):
         runtime = CapabilityRuntime(
             workspace_root=Path(self.temp_dir.name),

@@ -113,14 +113,26 @@ def test_test_capability_returns_subprocess_result(tmp_path):
         stderr="",
     )
 
+    verification = {
+        "tests_total": 3,
+        "tests_passed": 3,
+        "tests_failed": 0,
+        "tests_errors": 0,
+        "tests_skipped": 0,
+    }
+
     with patch(
         "capabilities.plugins.test.subprocess.run",
         return_value=completed,
     ) as run:
-        result = capability.execute(
-            {"operation": "pytest"},
-            context,
-        )
+        with patch(
+            "capabilities.plugins.test.TestCapability._read_verification_report",
+            return_value=verification,
+        ):
+            result = capability.execute(
+                {"operation": "pytest"},
+                context,
+            )
 
     assert result.ok is True
     assert result.code == "ok"
@@ -128,4 +140,5 @@ def test_test_capability_returns_subprocess_result(tmp_path):
     assert result.data["returncode"] == 0
     assert result.data["stdout"] == "3 passed in 0.05s"
     assert result.data["stderr"] == ""
+    assert result.data["verification"] == verification
     run.assert_called_once()

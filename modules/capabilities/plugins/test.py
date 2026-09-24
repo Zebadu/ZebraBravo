@@ -1,6 +1,8 @@
 ﻿from pathlib import Path
 import subprocess
+import tempfile
 from typing import Mapping
+import xml.etree.ElementTree as ET
 
 from capabilities.contracts import CapabilityMetadata, CapabilityResult
 
@@ -48,41 +50,102 @@ class TestCapability:
                 f"Unsupported test operation: {operation}",
             )
 
+        report_path = None
+
         try:
-            completed = subprocess.run(
-                [
-                    str(root / ".venv" / "Scripts" / "python.exe"),
-                    "-m",
-                    "pytest",
-                ],
-                cwd=root,
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                check=False,
+            with tempfile.NamedTemporaryFile(
+                suffix=".xml",
+                delete=False,
+            ) as report_file:
+                report_path = Path(report_file.name)
+
+            try:
+                completed = subprocess.run(
+                    [
+                        str(root / ".venv" / "Scripts" / "python.exe"),
+                        "-m",
+                        "pytest",
+                        f"--junit-xml={report_path}",
+                    ],
+                    cwd=root,
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    errors="replace",
+                    check=False,
+                )
+            except OSError:
+                return self._failure(
+                    "test_unavailable",
+                    "The ZebraBravo virtual-environment Python executable could not be accessed.",
+                )
+
+            try:
+                verification = self._read_verification_report(report_path)
+            except (OSError, ET.ParseError, ValueError) as exc:
+                return CapabilityResult(
+                    ok=False,
+                    data={
+                        "operation": operation,
+                        "returncode": completed.returncode,
+                        "stdout": completed.stdout,
+                        "stderr": completed.stderr,
+                    },
+                    message=f"JUnit verification report could not be read: {exc}",
+                    code="verification_unavailable",
+                )
+
+            return CapabilityResult(
+                ok=completed.returncode == 0,
+                data={
+                    "operation": operation,
+                    "returncode": completed.returncode,
+                    "stdout": completed.stdout,
+                    "stderr": completed.stderr,
+                    "verification": verification,
+                },
+                message=(
+                    "ZebraBravo test suite passed."
+                    if completed.returncode == 0
+                    else "ZebraBravo test suite failed."
+                ),
+                code="ok" if completed.returncode == 0 else "test_failed",
             )
         except OSError:
             return self._failure(
-                "test_unavailable",
-                "The ZebraBravo virtual-environment Python executable could not be accessed.",
+                "verification_unavailable",
+                "A temporary JUnit verification report could not be created.",
             )
+        finally:
+            if report_path is not None:
+                report_path.unlink(missing_ok=True)
 
-        return CapabilityResult(
-            ok=completed.returncode == 0,
-            data={
-                "operation": operation,
-                "returncode": completed.returncode,
-                "stdout": completed.stdout,
-                "stderr": completed.stderr,
-            },
-            message=(
-                "ZebraBravo test suite passed."
-                if completed.returncode == 0
-                else "ZebraBravo test suite failed."
+    @staticmethod
+    def _read_verification_report(report_path):
+        root = ET.parse(report_path).getroot()
+
+        if root.tag == "testsuites":
+            suite = root.find("testsuite")
+        elif root.tag == "testsuite":
+            suite = root
+        else:
+            raise ValueError("Unsupported JUnit report format.")
+
+        if suite is None:
+            raise ValueError("JUnit report contains no test suite.")
+
+        return {
+            "tests_total": int(suite.attrib.get("tests", 0)),
+            "tests_passed": (
+                int(suite.attrib.get("tests", 0))
+                - int(suite.attrib.get("failures", 0))
+                - int(suite.attrib.get("errors", 0))
+                - int(suite.attrib.get("skipped", 0))
             ),
-            code="ok" if completed.returncode == 0 else "test_failed",
-        )
+            "tests_failed": int(suite.attrib.get("failures", 0)),
+            "tests_errors": int(suite.attrib.get("errors", 0)),
+            "tests_skipped": int(suite.attrib.get("skipped", 0)),
+        }
 
     @staticmethod
     def _failure(code, message):

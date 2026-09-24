@@ -460,6 +460,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/memory_manager.py",
                 "modules/memory_service.py",
                 "modules/zoey_continuity_service.py",
+                "modules/continuity_service.py",
 
                 "modules/json_continuity_repository.py",
                 "modules/intent/__init__.py",

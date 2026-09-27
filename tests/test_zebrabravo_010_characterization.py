@@ -456,6 +456,8 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
             for relative_path in (
                 "core/main.py",
                 "modules/assistant.py",
+               "modules/artifact.py",
+               "modules/artifact_registry.py",
                 "modules/json_memory_repository.py",
                 "modules/memory_manager.py",
                 "modules/memory_service.py",
@@ -491,6 +493,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/plugins/filesystem.py",
                 "modules/capabilities/plugins/filesystem_write.py",
                 "modules/capabilities/plugins/git.py",
+                "modules/capabilities/plugins/powershell_execute.py",
                 "modules/capabilities/plugins/powershell_xray.py",
                 "modules/capabilities/plugins/truth.py",
                 "modules/capabilities/plugins/visual.py",
@@ -580,8 +583,3 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
-
-

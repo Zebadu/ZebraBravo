@@ -48,6 +48,7 @@ class CapabilityRuntimeTests(unittest.TestCase):
                 "filesystem",
                 "filesystem_write",
                 "git",
+                "powershell_execute",
                 "powershell_xray",
                 "test",
                 "truth",

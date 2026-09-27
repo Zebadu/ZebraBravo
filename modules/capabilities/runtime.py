@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 from capabilities.context import CapabilityContext
 from capabilities.development_authorization import DevelopmentAuthorization
@@ -12,6 +12,7 @@ from capabilities.plugins.filesystem import FileSystemCapability
 from capabilities.plugins.filesystem_write import FileWriteCapability
 from capabilities.plugins.git import GitCapability
 from capabilities.plugins.powershell_xray import PowerShellXRayCapability
+from capabilities.plugins.powershell_execute import PowerShellExecuteCapability
 from capabilities.plugins.windows_diagnostics import WindowsDiagnosticsCapability
 from capabilities.plugins.truth import TruthCapability
 from capabilities.plugins.test import TestCapability
@@ -42,6 +43,7 @@ class CapabilityRuntime:
         self.registry.register(FileWriteCapability())
         self.registry.register(GitCapability())
         self.registry.register(PowerShellXRayCapability())
+        self.registry.register(PowerShellExecuteCapability())
         self.registry.register(WindowsDiagnosticsCapability())
         self.registry.register(TruthCapability())
         self.registry.register(TestCapability())

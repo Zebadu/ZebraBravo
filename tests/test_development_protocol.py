@@ -296,5 +296,66 @@ class DevelopmentProtocolTests(unittest.TestCase):
             DevelopmentProtocol(None)
 
 
+    def test_protocol_routes_powershell_execute_through_development_mode(self):
+        runtime = CapabilityRuntime(
+            workspace_root=self.root,
+            permissions={
+                "powershell.execute",
+            },
+        )
+
+        interface = DevelopmentInterface(runtime)
+        protocol = DevelopmentProtocol(interface)
+
+        blocked = protocol.handle(
+            {
+                "request_id": "powershell-execute-off",
+                "operation": "powershell_execute",
+                "payload": {
+                    "command": "Write-Output 'MUST_NOT_RUN'",
+                },
+            }
+        )
+
+        self.assertFalse(blocked["ok"])
+        self.assertEqual(
+            blocked["code"],
+            "confirmation_required",
+        )
+        self.assertEqual(
+            blocked["request_id"],
+            "powershell-execute-off",
+        )
+
+        runtime.development_authorization.enable()
+
+        allowed = protocol.handle(
+            {
+                "request_id": "powershell-execute-on",
+                "operation": "powershell_execute",
+                "payload": {
+                    "command": "Write-Output 'PROTOCOL_EXECUTION_PROOF'",
+                },
+            }
+        )
+
+        self.assertTrue(allowed["ok"])
+        self.assertEqual(
+            allowed["request_id"],
+            "powershell-execute-on",
+        )
+        self.assertEqual(
+            allowed["operation"],
+            "powershell_execute",
+        )
+        self.assertEqual(
+            allowed["data"]["stdout"].strip(),
+            "PROTOCOL_EXECUTION_PROOF",
+        )
+        self.assertEqual(
+            allowed["data"]["returncode"],
+            0,
+        )
+
 if __name__ == "__main__":
     unittest.main()

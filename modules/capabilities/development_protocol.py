@@ -19,6 +19,8 @@ class DevelopmentProtocol:
             "git_status",
             "git_log",
             "git_diff",
+            "powershell_execute",
+            "powershell_xray",
             "development_mode",
             "write",
             "test",
@@ -140,4 +142,3 @@ class DevelopmentProtocol:
     @staticmethod
     def _new_request_id():
         return uuid4().hex
-

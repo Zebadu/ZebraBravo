@@ -1,4 +1,4 @@
-﻿import subprocess
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -61,6 +61,7 @@ class DevelopmentInterfaceTests(unittest.TestCase):
                 "filesystem",
                 "filesystem_write",
                 "git",
+                "powershell_execute",
                 "powershell_xray",
                 "test",
                 "truth",

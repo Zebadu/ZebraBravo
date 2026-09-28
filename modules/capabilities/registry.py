@@ -26,6 +26,9 @@ class CapabilityRegistry:
                 "required_permissions": sorted(
                     capability.metadata.required_permissions
                 ),
+                "operations": sorted(
+                    capability.metadata.operations
+                ),
             }
             for capability in (
                 self._capabilities[name]

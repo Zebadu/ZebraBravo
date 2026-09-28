@@ -10,6 +10,7 @@ class GitCapability:
         name="git",
         description="Read-only access to Git repository state within an approved workspace.",
         required_permissions=frozenset({"git.read"}),
+        operations=frozenset({"status", "log", "diff"}),
     )
 
     _ALLOWED_OPERATIONS = frozenset({"status", "log", "diff"})

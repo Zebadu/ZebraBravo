@@ -13,6 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT)); sys.path.insert(0, str(PROJECT_ROOT / 'modules'))
 
 from modules.assistant import Assistant
+from modules.artifact_registry import ArtifactRegistry
 from intent.simple_reasoner import SimpleIntentReasoner
 from capabilities.runtime import CapabilityRuntime
 from json_memory_repository import JsonMemoryRepository
@@ -38,6 +39,9 @@ memory_service = MemoryService(memory_repository)
 memory = memory_service.search("")
 
 
+# Create the artifact registry
+artifact_registry = ArtifactRegistry()
+
 # Create the Zoey continuity service
 
 CONTINUITY_FILE = PROJECT_ROOT / "data" / "project_continuity.json"
@@ -57,6 +61,7 @@ capability_runtime = CapabilityRuntime(
         "test.run",
         "continuity.read",
         "continuity.write",
+        "powershell.execute",
     },
     dependencies={
         "continuity": continuity_service,
@@ -129,6 +134,7 @@ assistant = Assistant(
     PROJECT_ROOT,
     memory_service,
     capability_runtime=capability_runtime,
+    artifact_registry=artifact_registry,
     intent_reasoner=SimpleIntentReasoner(),
 )
 
@@ -152,6 +158,10 @@ try:
 finally:
     if development_bridge_started:
         development_bridge.stop()
+
+
+
+
 
 
 

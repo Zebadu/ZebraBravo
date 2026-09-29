@@ -187,3 +187,69 @@ def test_zoey_identity_requires_service_dependency():
 
     assert not result.ok
     assert result.code == "context_required"
+def test_zoey_identity_exposes_visual_canon():
+    project_root = Path(__file__).resolve().parents[1]
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        zoey_service = ZoeyContinuityService(repository)
+
+        runtime = CapabilityRuntime(
+            workspace_root=Path(continuity_file.parent),
+            permissions={"zoey.identity.read"},
+            dependencies={
+                "zoey_continuity": zoey_service,
+            },
+        )
+
+        result = runtime.execute(
+            "zoey_identity",
+            {
+                "operation": "get_identity",
+            },
+        )
+
+        assert result.ok
+        assert result.data["visual_canon"]["priority"] == (
+            "face_identity_primary"
+        )
+        assert result.data["visual_canon"]["reference"]["sha256"] == (
+            "4A06E28104D1AC31D445075C072E6909E1241E0CE035EFEADFBF8F438072C8CA"
+        )
+    finally:
+        continuity_file.unlink()
+
+
+def test_zoey_identity_can_read_visual_canon_directly():
+    project_root = Path(__file__).resolve().parents[1]
+    continuity_file = create_test_continuity_file(project_root)
+
+    try:
+        repository = JsonContinuityRepository(continuity_file)
+        zoey_service = ZoeyContinuityService(repository)
+
+        runtime = CapabilityRuntime(
+            workspace_root=Path(continuity_file.parent),
+            permissions={"zoey.identity.read"},
+            dependencies={
+                "zoey_continuity": zoey_service,
+            },
+        )
+
+        result = runtime.execute(
+            "zoey_identity",
+            {
+                "operation": "get_visual_canon",
+            },
+        )
+
+        assert result.ok
+        assert result.data["status"] == (
+            "canonical_reference_established"
+        )
+        assert result.data["reference"]["path"].endswith(
+            "AA Revised Cannonical .png"
+        )
+    finally:
+        continuity_file.unlink()

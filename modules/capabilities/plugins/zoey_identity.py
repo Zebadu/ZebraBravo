@@ -46,6 +46,7 @@ class ZoeyIdentityCapability:
                     "status": zoey["status"],
                     "personality": zoey["personality"],
                     "future_domains": zoey["future_domains"],
+                    "visual_canon": zoey["visual_canon"],
                     "identity_principles": [
                         {
                             "id": "origin_and_gratitude",
@@ -71,6 +72,12 @@ class ZoeyIdentityCapability:
                         },
                     ],
                 },
+            )
+
+        if operation == "get_visual_canon":
+            return CapabilityResult(
+                ok=True,
+                data=zoey_continuity.get_visual_canon(),
             )
 
         return CapabilityResult(

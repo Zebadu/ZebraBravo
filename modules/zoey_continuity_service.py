@@ -3,6 +3,7 @@ class ZoeyContinuityService:
         "status",
         "personality",
         "future_domains",
+        "visual_canon",
     }
 
     def __init__(self, repository):
@@ -43,3 +44,7 @@ class ZoeyContinuityService:
             traits.append(trait)
 
         self.repository.save(continuity)
+
+    def get_visual_canon(self):
+        zoey = self.get_current()
+        return zoey["visual_canon"]

@@ -51,6 +51,19 @@ class McpDevelopmentAdapter:
                 "properties": {"limit": {"type": "integer", "minimum": 1}},
             },
         },
+        "powershell_xray": {
+            "description": "Return governed PowerShell environment information.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "operation": {
+                        "type": "string",
+                        "enum": ["environment", "version"],
+                    },
+                },
+                "required": ["operation"],
+            },
+        },
         "git_diff": {
             "description": "Return the governed working-tree diff.",
             "inputSchema": {"type": "object", "properties": {}},

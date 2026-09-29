@@ -1,4 +1,4 @@
-﻿from memory_manager import MemoryManager
+from memory_manager import MemoryManager
 from intent.executor import IntentExecutor
 from intent.interpreter import IntentInterpreter
 from intent.formation import IntentFormation
@@ -15,6 +15,7 @@ class Assistant:
         intent_executor=None,
         intent_formation=None,
         intent_reasoner=None,
+        artifact_registry=None,
     ):
         if memory_service is None:
             memory_service = MemoryManager(project_root)
@@ -29,6 +30,7 @@ class Assistant:
         )
 
         self.intent_reasoner = intent_reasoner
+        self.artifact_registry = artifact_registry
 
         self.intent_formation = (
             intent_formation
@@ -297,4 +299,3 @@ class Assistant:
         print("  help             - Show this help")
         print("  exit             - Exit ZebraBravo")
         print()
-

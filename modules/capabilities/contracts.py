@@ -26,7 +26,7 @@ class CapabilityRequest:
 
 @dataclass(frozen=True)
 class CapabilityResult:
-    """The structured result returned by a capability execution."""
+    """The structured result returned from a capability execution."""
 
     ok: bool
     data: object | None = None

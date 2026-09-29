@@ -21,6 +21,7 @@ from json_continuity_repository import JsonContinuityRepository
 from memory_service import MemoryService
 from continuity_service import ContinuityService
 from zoey_continuity_service import ZoeyContinuityService
+from ui.desktop.gateway import DesktopGateway
 
 
 # Load configuration
@@ -48,6 +49,7 @@ CONTINUITY_FILE = PROJECT_ROOT / "data" / "project_continuity.json"
 continuity_repository = JsonContinuityRepository(CONTINUITY_FILE)
 continuity_service = ContinuityService(continuity_repository)
 zoey_continuity_service = ZoeyContinuityService(continuity_repository)
+desktop_gateway = DesktopGateway()
 
 
 # Create the controlled capability runtime
@@ -62,10 +64,12 @@ capability_runtime = CapabilityRuntime(
         "continuity.read",
         "continuity.write",
         "powershell.execute",
+        "desktop.read",
     },
     dependencies={
         "continuity": continuity_service,
         "zoey_continuity": zoey_continuity_service,
+        "desktop_gateway": desktop_gateway,
     },
 )
 

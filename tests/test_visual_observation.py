@@ -11,7 +11,8 @@ from capabilities.visual_observation import VisualObservation  # noqa: E402
 def test_visual_observation_from_capture():
     capture = {
         "title": "Blender",
-        "size": (800, 600),
+        "width": 800,
+        "height": 600,
         "format": "BGRA",
         "bytes": b"pixel-data",
     }

@@ -41,7 +41,8 @@ class VisualObservation:
     @classmethod
     def from_capture(cls, capture):
         captured_at = datetime.now(timezone.utc).isoformat()
-        width, height = capture["size"]
+        width = capture["width"]
+        height = capture["height"]
 
         return cls(
             observation_id=f"desktop-{captured_at}",

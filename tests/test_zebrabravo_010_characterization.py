@@ -455,6 +455,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
 
             for relative_path in (
                 "core/main.py",
+                             "ui/desktop/gateway.py",
                 "modules/assistant.py",
                "modules/artifact.py",
                "modules/artifact_registry.py",

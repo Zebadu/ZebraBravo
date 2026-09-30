@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from capabilities.context import CapabilityContext
+from capabilities.governance import GovernanceContext
 from capabilities.development_authorization import DevelopmentAuthorization
 from capabilities.development_bridge import DevelopmentBridge
 from capabilities.development_service import DevelopmentService
@@ -33,6 +34,7 @@ class CapabilityRuntime:
         allowed_capabilities=None,
         denied_capabilities=(),
         dependencies=None,
+        governance_context=None,
     ):
         self.registry = CapabilityRegistry()
 
@@ -82,6 +84,11 @@ class CapabilityRuntime:
             ),
             dependencies=runtime_dependencies,
             permissions=frozenset(permissions),
+            governance_context=(
+                GovernanceContext()
+                if governance_context is None
+                else governance_context
+            ),
         )
 
         self.development_service = DevelopmentService(self)

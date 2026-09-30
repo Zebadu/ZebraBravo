@@ -473,6 +473,7 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/intent/formation.py",
                 "modules/intent/simple_reasoner.py",
                 "modules/capabilities/context.py",
+                "modules/capabilities/governance.py",
                 "modules/capabilities/contracts.py",
                 "modules/capabilities/executor.py",
                 "modules/capabilities/policy.py",

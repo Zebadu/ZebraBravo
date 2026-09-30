@@ -3,12 +3,15 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Mapping
 
+from capabilities.governance import GovernanceContext
+
 
 @dataclass(frozen=True)
 class CapabilityContext:
     workspace_root: Path | None = None
     dependencies: Mapping[str, object] = field(default_factory=dict)
     permissions: frozenset[str] = field(default_factory=frozenset)
+    governance_context: GovernanceContext = field(default_factory=GovernanceContext)
 
     def __post_init__(self):
         object.__setattr__(self, "dependencies", MappingProxyType(dict(self.dependencies)))

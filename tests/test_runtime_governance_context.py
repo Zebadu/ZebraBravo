@@ -112,5 +112,55 @@ def test_runtime_propagates_governance_context_to_capability():
     }
 
 
+class ContextCaptureCapability:
+    metadata = CapabilityMetadata(
+        name="context_capture",
+        description="Test capability for governance context propagation.",
+        side_effect="read",
+    )
+
+    def execute(self, request, context):
+        governance = context.governance_context
+
+        return CapabilityResult(
+            ok=True,
+            data={
+                "principal": governance.principal,
+                "authority": governance.authority,
+                "mission_id": governance.mission_id,
+                "resource_scope": governance.resource_scope,
+            },
+        )
+
+
+def test_runtime_propagates_governance_context_to_capability():
+    governance = GovernanceContext(
+        principal="Zeb",
+        authority="owner",
+        mission_id="governance-context-propagation",
+        resource_scope=("zebrabravo",),
+    )
+
+    runtime = CapabilityRuntime(
+        workspace_root=PROJECT_ROOT,
+        governance_context=governance,
+    )
+
+    runtime.registry.register(ContextCaptureCapability())
+
+    result = runtime.execute(
+        "context_capture",
+        {"operation": "inspect"},
+    )
+
+    assert result.ok
+    assert result.data == {
+        "principal": "Zeb",
+        "authority": "owner",
+        "mission_id": "governance-context-propagation",
+        "resource_scope": ("zebrabravo",),
+    }
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,7 @@ class DevelopmentProtocol:
             "git_diff",
             "powershell_execute",
             "powershell_xray",
+            "desktop",
             "development_mode",
             "write",
             "test",

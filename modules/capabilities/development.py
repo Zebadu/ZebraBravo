@@ -17,6 +17,7 @@ class DevelopmentInterface:
             "git_log",
             "git_diff",
             "powershell_xray",
+            "desktop",
             "powershell_execute",
             "windows_diagnostics",
             "test",
@@ -63,6 +64,9 @@ class DevelopmentInterface:
         if operation in {"git_status", "git_log", "git_diff"}:
             return self._git(operation, request)
 
+
+        if operation == "desktop":
+            return self._desktop(request)
 
         if operation == "powershell_execute":
             return self._powershell_execute(request)
@@ -266,6 +270,12 @@ class DevelopmentInterface:
             "windows_diagnostics",
             capability_request,
         )
+    def _desktop(self, request):
+        return self.runtime.execute(
+            "desktop",
+            dict(request),
+        )
+
     def _powershell_xray(self, request):
         capability_request = dict(request)
         if "operation" not in capability_request:

@@ -32,6 +32,12 @@ class DesktopGateway:
         if operation == "capture":
             return self.capture(request.get("title"))
 
+        if operation == "read_terminal":
+            return self.read_terminal(
+                title=request.get("title", "Windows PowerShell"),
+                limit=request.get("limit", 12000),
+            )
+
         return CapabilityResult(
             ok=False,
             message=f"Unsupported desktop operation: {operation}",
@@ -128,6 +134,78 @@ class DesktopGateway:
                 win32gui.DeleteObject(bitmap.GetHandle())
             except Exception:
                 pass
+
+    def read_terminal(self, title="Windows PowerShell", limit=12000):
+        try:
+            limit = int(limit)
+        except (TypeError, ValueError):
+            return CapabilityResult(
+                ok=False,
+                message="Terminal text limit must be an integer.",
+                code="invalid_request",
+            )
+
+        limit = max(1, min(limit, 100000))
+
+        try:
+            import comtypes.client
+
+            desktop = Desktop(backend=self.backend)
+            window = desktop.window(title_re=title)
+
+            if not window.exists():
+                return CapabilityResult(
+                    ok=False,
+                    message=f"Desktop window not found: {title}",
+                    code="window_not_found",
+                )
+
+            terminal = window.child_window(
+                control_type="Text",
+                class_name="TermControl",
+            )
+
+            if not terminal.exists():
+                return CapabilityResult(
+                    ok=False,
+                    message="Terminal control not found.",
+                    code="terminal_not_found",
+                )
+
+            wrapper = terminal.wrapper_object()
+            element = wrapper.element_info.element
+
+            automation = comtypes.client.GetModule("UIAutomationCore.dll")
+            pattern = element.GetCurrentPattern(10014).QueryInterface(
+                automation.IUIAutomationTextPattern
+            )
+
+            text = pattern.DocumentRange.GetText(-1)
+            text = text.rstrip()
+
+            if len(text) > limit:
+                text = text[-limit:]
+                truncated = True
+            else:
+                truncated = False
+
+            return CapabilityResult(
+                ok=True,
+                data={
+                    "title": window.window_text(),
+                    "control": "TermControl",
+                    "text": text,
+                    "length": len(text),
+                    "truncated": truncated,
+                },
+            )
+
+        except Exception as error:
+            return CapabilityResult(
+                ok=False,
+                message=str(error),
+                code="terminal_read_failed",
+            )
 
     def inspect(self):
         desktop = Desktop(backend=self.backend)

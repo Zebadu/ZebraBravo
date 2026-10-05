@@ -500,6 +500,8 @@ class CoreMainStartupIntegrationTests(unittest.TestCase):
                 "modules/capabilities/plugins/truth.py",
                 "modules/capabilities/plugins/visual.py",
                 "modules/capabilities/plugins/zoey_identity.py",
+                "modules/json_environment_knowledge_repository.py",
+                "modules/environment_knowledge_service.py",
                 "config/config.json",
             ):
                 source = PROJECT_ROOT / relative_path

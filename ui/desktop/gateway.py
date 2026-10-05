@@ -74,8 +74,8 @@ class DesktopGateway:
                     code="capture_failed",
                 )
 
-            window_dc = win32gui.GetWindowDC(hwnd)
-            source_dc = win32ui.CreateDCFromHandle(window_dc)
+            screen_dc = win32gui.GetDC(0)
+            source_dc = win32ui.CreateDCFromHandle(screen_dc)
             memory_dc = source_dc.CreateCompatibleDC()
 
             bitmap = win32ui.CreateBitmap()
@@ -86,7 +86,7 @@ class DesktopGateway:
                 (0, 0),
                 (width, height),
                 source_dc,
-                (0, 0),
+                (left, top),
                 win32con.SRCCOPY,
             )
 
@@ -95,7 +95,7 @@ class DesktopGateway:
             return CapabilityResult(
                 ok=True,
                 data={
-                    "title": title,
+                    "title": title or "Windows Desktop",
                     "left": left,
                     "top": top,
                     "right": right,
@@ -126,7 +126,7 @@ class DesktopGateway:
                 pass
 
             try:
-                win32gui.ReleaseDC(hwnd, window_dc)
+                win32gui.ReleaseDC(0, screen_dc)
             except Exception:
                 pass
 

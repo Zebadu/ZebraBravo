@@ -1,0 +1,1 @@
+﻿"""ZebraBravo architectural invariants."""

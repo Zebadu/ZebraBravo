@@ -18,8 +18,10 @@ from intent.simple_reasoner import SimpleIntentReasoner
 from capabilities.runtime import CapabilityRuntime
 from json_memory_repository import JsonMemoryRepository
 from json_continuity_repository import JsonContinuityRepository
+from json_environment_knowledge_repository import JsonEnvironmentKnowledgeRepository
 from memory_service import MemoryService
 from continuity_service import ContinuityService
+from environment_knowledge_service import EnvironmentKnowledgeService
 from zoey_continuity_service import ZoeyContinuityService
 from ui.desktop.gateway import DesktopGateway
 
@@ -49,6 +51,9 @@ CONTINUITY_FILE = PROJECT_ROOT / "data" / "project_continuity.json"
 continuity_repository = JsonContinuityRepository(CONTINUITY_FILE)
 continuity_service = ContinuityService(continuity_repository)
 zoey_continuity_service = ZoeyContinuityService(continuity_repository)
+ENVIRONMENT_KNOWLEDGE_FILE = PROJECT_ROOT / "data" / "environment_knowledge.json"
+environment_knowledge_repository = JsonEnvironmentKnowledgeRepository(ENVIRONMENT_KNOWLEDGE_FILE)
+environment_knowledge_service = EnvironmentKnowledgeService(environment_knowledge_repository)
 desktop_gateway = DesktopGateway()
 
 
@@ -70,6 +75,7 @@ capability_runtime = CapabilityRuntime(
         "continuity": continuity_service,
         "zoey_continuity": zoey_continuity_service,
         "desktop_gateway": desktop_gateway,
+        "environment_knowledge": environment_knowledge_service,
     },
 )
 
@@ -162,12 +168,3 @@ try:
 finally:
     if development_bridge_started:
         development_bridge.stop()
-
-
-
-
-
-
-
-
-

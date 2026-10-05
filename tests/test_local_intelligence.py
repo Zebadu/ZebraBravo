@@ -20,3 +20,18 @@ def test_simple_reasoner_can_form_read_file_intent():
         "parameters": {"path": "README"},
         "route": "capability",
     }
+
+def test_simple_reasoner_can_form_read_terminal_intent():
+    reasoner = SimpleIntentReasoner()
+
+    result = reasoner.reason("Please show me my PowerShell terminal.")
+
+    assert result == {
+        "name": "read_terminal",
+        "capability": "desktop",
+        "operation": "read_terminal",
+        "parameters": {
+            "title": "Windows PowerShell",
+        },
+        "route": "capability",
+    }

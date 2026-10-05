@@ -11,6 +11,25 @@ class SimpleIntentReasoner:
         if not text:
             raise ValueError("Request cannot be empty.")
 
+        terminal_match = re.search(
+            r"(?:show|read|open|display|look\s+at)\s+"
+            r"(?:me\s+)?(?:my\s+)?(?:the\s+)?"
+            r"(?:PowerShell\s+)?terminal\b",
+            text,
+            re.IGNORECASE,
+        )
+
+        if terminal_match:
+            return {
+                "name": "read_terminal",
+                "capability": "desktop",
+                "operation": "read_terminal",
+                "parameters": {
+                    "title": "Windows PowerShell",
+                },
+                "route": "capability",
+            }
+
         match = re.search(
             r"(?:show|read|open|display)\s+(?:me\s+)?(?:the\s+)?(.+)",
             text,

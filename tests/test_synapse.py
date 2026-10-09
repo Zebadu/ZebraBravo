@@ -16,6 +16,22 @@ class SynapseClientTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         class Handler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                if self.path != "/health":
+                    self.send_response(404)
+                    self.end_headers()
+                    return
+
+                response = {
+                    "ok": True,
+                    "service": "zebrabravo-development-bridge",
+                    "version": "0.1",
+                }
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(response).encode("utf-8"))
+
             def do_POST(self):
                 if self.path != "/development":
                     self.send_response(404)
@@ -75,6 +91,28 @@ class SynapseClientTests(unittest.TestCase):
             f"http://127.0.0.1:{self.port}/development",
             "TEST-TOKEN",
         )
+
+    def test_health_returns_expected_service_identity(self):
+        response = self.make_client().health()
+
+        self.assertTrue(response["ok"])
+        self.assertEqual(
+            response["service"],
+            "zebrabravo-development-bridge",
+        )
+        self.assertEqual(response["version"], "0.1")
+
+    def test_health_reports_unavailable_bridge(self):
+        client = SynapseClient(
+            "http://127.0.0.1:1/development",
+            "TEST-TOKEN",
+            timeout=0.5,
+        )
+
+        response = client.health()
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["code"], "bridge_unavailable")
 
     def test_project_info_request(self):
         response = self.make_client().request(

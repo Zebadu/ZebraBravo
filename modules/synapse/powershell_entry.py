@@ -24,10 +24,28 @@ def main():
     if not isinstance(payload, dict):
         raise SystemExit("JSON payload must be an object")
 
+    token = (
+        os.environ.get("ZEBRABRAVO_DEVELOPMENT_TOKEN", "")
+        if operation == "health"
+        else os.environ["ZEBRABRAVO_DEVELOPMENT_TOKEN"]
+    )
     client = SynapseClient(
         "http://127.0.0.1:52336/development",
-        os.environ["ZEBRABRAVO_DEVELOPMENT_TOKEN"],
+        token,
     )
+
+    if operation == "health":
+        result = client.health()
+        print("=== ZEBRALINK RESPONSE ===")
+        print("OK:", result.get("ok"))
+        if result.get("ok"):
+            print("SERVICE:", result["service"])
+            print("VERSION:", result["version"])
+        else:
+            print("CODE:", result.get("code"))
+            print("MESSAGE:", result.get("message", result.get("data", "")))
+        print("=== END ZEBRALINK RESPONSE ===")
+        return
 
     result = client.request(
         operation,

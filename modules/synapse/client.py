@@ -62,7 +62,18 @@ class SynapseClient:
 
         try:
             with urlopen(request, timeout=self.timeout) as response:
-                return json.loads(response.read().decode("utf-8"))
+                result = json.loads(response.read().decode("utf-8"))
+
+            if not isinstance(result, dict):
+                return {
+                    "ok": False,
+                    "code": "invalid_response",
+                    "message": "Expected a JSON object from the bridge",
+                    "request_id": request_id,
+                    "operation": operation,
+                }
+
+            return result
         except HTTPError as exc:
             return {
                 "ok": False,

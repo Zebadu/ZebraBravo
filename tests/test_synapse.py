@@ -204,5 +204,20 @@ class SynapseClientTests(unittest.TestCase):
         self.assertEqual(response["request_id"], "test-invalid-json")
         self.assertEqual(response["operation"], "project_info")
 
+    def test_request_reports_non_object_json_response(self):
+        mocked_response = MagicMock()
+        mocked_response.__enter__.return_value.read.return_value = b"[]"
+
+        with patch("synapse.client.urlopen", return_value=mocked_response):
+            response = self.make_client().request(
+                "project_info",
+                request_id="test-wrong-response-type",
+            )
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["code"], "invalid_response")
+        self.assertEqual(response["request_id"], "test-wrong-response-type")
+        self.assertEqual(response["operation"], "project_info")
+
 if __name__ == "__main__":
     unittest.main()

@@ -8,6 +8,8 @@ sys.path.insert(0, str(MODULES_DIR))
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.error import HTTPError, URLError
+from unittest.mock import MagicMock, patch
 
 from synapse.client import SynapseClient
 
@@ -151,6 +153,56 @@ class SynapseClientTests(unittest.TestCase):
             "hello.txt",
         )
 
+
+
+    def test_request_reports_bridge_unavailable(self):
+        with patch(
+            "synapse.client.urlopen",
+            side_effect=URLError("bridge offline"),
+        ):
+            response = self.make_client().request(
+                "project_info",
+                request_id="test-offline",
+            )
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["code"], "bridge_unavailable")
+        self.assertEqual(response["request_id"], "test-offline")
+        self.assertEqual(response["operation"], "project_info")
+
+    def test_request_reports_http_error(self):
+        error = HTTPError(
+            "http://127.0.0.1/development",
+            401,
+            "Unauthorized",
+            hdrs=None,
+            fp=None,
+        )
+        with patch("synapse.client.urlopen", side_effect=error):
+            response = self.make_client().request(
+                "project_info",
+                request_id="test-http-error",
+            )
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["code"], "http_error")
+        self.assertEqual(response["request_id"], "test-http-error")
+        self.assertEqual(response["operation"], "project_info")
+
+    def test_request_reports_invalid_json_response(self):
+        mocked_response = MagicMock()
+        mocked_response.__enter__.return_value.read.return_value = b"not-json"
+
+        with patch("synapse.client.urlopen", return_value=mocked_response):
+            response = self.make_client().request(
+                "project_info",
+                request_id="test-invalid-json",
+            )
+
+        self.assertFalse(response["ok"])
+        self.assertEqual(response["code"], "invalid_response")
+        self.assertEqual(response["request_id"], "test-invalid-json")
+        self.assertEqual(response["operation"], "project_info")
 
 if __name__ == "__main__":
     unittest.main()

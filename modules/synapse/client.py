@@ -60,5 +60,30 @@ class SynapseClient:
             method="POST",
         )
 
-        with urlopen(request, timeout=self.timeout) as response:
-            return json.loads(response.read().decode("utf-8"))
+        try:
+            with urlopen(request, timeout=self.timeout) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except HTTPError as exc:
+            return {
+                "ok": False,
+                "code": "http_error",
+                "message": f"HTTP {exc.code}",
+                "request_id": request_id,
+                "operation": operation,
+            }
+        except (URLError, TimeoutError, OSError) as exc:
+            return {
+                "ok": False,
+                "code": "bridge_unavailable",
+                "message": str(exc),
+                "request_id": request_id,
+                "operation": operation,
+            }
+        except (ValueError, UnicodeDecodeError) as exc:
+            return {
+                "ok": False,
+                "code": "invalid_response",
+                "message": str(exc),
+                "request_id": request_id,
+                "operation": operation,
+            }

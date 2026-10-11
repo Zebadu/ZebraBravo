@@ -29,9 +29,11 @@ def main():
         if operation == "health"
         else os.environ["ZEBRABRAVO_DEVELOPMENT_TOKEN"]
     )
+    timeout = float(os.environ.get("ZEBRALINK_TIMEOUT", "10"))
     client = SynapseClient(
         "http://127.0.0.1:52336/development",
         token,
+        timeout=timeout,
     )
 
     if operation == "health":

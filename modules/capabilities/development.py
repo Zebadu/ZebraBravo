@@ -20,6 +20,7 @@ class DevelopmentInterface:
             "desktop",
             "powershell_execute",
             "windows_diagnostics",
+            "windows_processes",
             "test",
         }
     )
@@ -73,6 +74,9 @@ class DevelopmentInterface:
 
         if operation == "windows_diagnostics":
             return self._windows_diagnostics(request)
+
+        if operation == "windows_processes":
+            return self._windows_processes(request)
 
         if operation == "test":
             return self._test(request)
@@ -268,6 +272,17 @@ class DevelopmentInterface:
 
         return self.runtime.execute(
             "windows_diagnostics",
+            capability_request,
+        )
+
+    def _windows_processes(self, request):
+        capability_request = dict(request)
+
+        if "operation" not in capability_request:
+            capability_request["operation"] = "list"
+
+        return self.runtime.execute(
+            "windows_processes",
             capability_request,
         )
     def _desktop(self, request):

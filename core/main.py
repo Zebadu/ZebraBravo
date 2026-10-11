@@ -16,6 +16,7 @@ from modules.assistant import Assistant
 from modules.artifact_registry import ArtifactRegistry
 from intent.simple_reasoner import SimpleIntentReasoner
 from capabilities.runtime import CapabilityRuntime
+# Qwen vision client is imported only when vision is enabled.
 from json_memory_repository import JsonMemoryRepository
 from json_continuity_repository import JsonContinuityRepository
 from json_environment_knowledge_repository import JsonEnvironmentKnowledgeRepository
@@ -59,24 +60,44 @@ desktop_gateway = DesktopGateway()
 
 # Create the controlled capability runtime
 
+# Vision is opt-in. Its provider communicates with the separate local worker.
+vision_config = config.get("vision", {})
+vision_enabled = (
+    vision_config.get("enabled", False) is True
+    or os.environ.get("ZEBRABRAVO_VISION_ENABLED") == "1"
+)
+
+runtime_permissions = {
+    "filesystem.read",
+    "filesystem.write",
+    "git.read",
+    "test.run",
+    "continuity.read",
+    "continuity.write",
+    "powershell.execute",
+    "desktop.read",
+}
+
+runtime_dependencies = {
+    "continuity": continuity_service,
+    "zoey_continuity": zoey_continuity_service,
+    "desktop_gateway": desktop_gateway,
+    "environment_knowledge": environment_knowledge_service,
+}
+
+if vision_enabled:
+    from vision.worker_client import QwenWorkerClient
+
+    runtime_dependencies["vision_provider"] = QwenWorkerClient(
+        url=os.environ.get("ZEBRABRAVO_VISION_URL") or vision_config.get("url"),
+        timeout=vision_config.get("timeout_seconds", 240),
+    )
+    runtime_permissions.add("vision.interpret")
+
 capability_runtime = CapabilityRuntime(
     workspace_root=PROJECT_ROOT,
-    permissions={
-        "filesystem.read",
-        "filesystem.write",
-        "git.read",
-        "test.run",
-        "continuity.read",
-        "continuity.write",
-        "powershell.execute",
-        "desktop.read",
-    },
-    dependencies={
-        "continuity": continuity_service,
-        "zoey_continuity": zoey_continuity_service,
-        "desktop_gateway": desktop_gateway,
-        "environment_knowledge": environment_knowledge_service,
-    },
+    permissions=runtime_permissions,
+    dependencies=runtime_dependencies,
 )
 
 

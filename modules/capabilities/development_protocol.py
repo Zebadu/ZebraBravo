@@ -25,6 +25,7 @@ class DevelopmentProtocol:
             "development_mode",
             "write",
             "test",
+            "windows_processes",
         }
     )
 

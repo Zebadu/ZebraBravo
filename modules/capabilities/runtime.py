@@ -15,9 +15,11 @@ from capabilities.plugins.git import GitCapability
 from capabilities.plugins.powershell_xray import PowerShellXRayCapability
 from capabilities.plugins.powershell_execute import PowerShellExecuteCapability
 from capabilities.plugins.windows_diagnostics import WindowsDiagnosticsCapability
+from capabilities.plugins.windows_processes import WindowsProcessesCapability
 from capabilities.plugins.truth import TruthCapability
 from capabilities.plugins.test import TestCapability
 from capabilities.plugins.visual import VisualCapability
+from capabilities.plugins.vision_understanding import VisionUnderstandingCapability
 from capabilities.plugins.zoey_identity import ZoeyIdentityCapability
 from capabilities.policy import DefaultCapabilityPolicy
 from capabilities.policy_gateway import PolicyCapabilityGateway
@@ -47,9 +49,11 @@ class CapabilityRuntime:
         self.registry.register(PowerShellXRayCapability())
         self.registry.register(PowerShellExecuteCapability())
         self.registry.register(WindowsDiagnosticsCapability())
+        self.registry.register(WindowsProcessesCapability())
         self.registry.register(TruthCapability())
         self.registry.register(TestCapability())
         self.registry.register(VisualCapability())
+        self.registry.register(VisionUnderstandingCapability())
         self.registry.register(ZoeyIdentityCapability())
 
         self.executor = CapabilityExecutor(self.registry)

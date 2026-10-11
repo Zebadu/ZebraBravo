@@ -1,6 +1,6 @@
 ﻿param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("project_info", "read", "write", "search")]
+    [ValidateSet("project_info", "read", "write", "search", "windows_processes")]
     [string]$Operation,
 
     [Parameter(Mandatory = $false)]

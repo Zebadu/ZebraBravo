@@ -52,8 +52,10 @@ class CapabilityRuntimeTests(unittest.TestCase):
                 "powershell_xray",
                 "test",
                 "truth",
+                "vision_understanding",
                 "visual",
                 "windows_diagnostics",
+                "windows_processes",
                 "zoey_identity",
             ),
         )

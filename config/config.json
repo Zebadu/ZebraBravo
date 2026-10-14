@@ -12,6 +12,6 @@
   "vision": {
     "enabled": false,
     "url": "http://127.0.0.1:52337/describe",
-    "timeout_seconds": 240
+    "timeout_seconds": 360
   }
 }

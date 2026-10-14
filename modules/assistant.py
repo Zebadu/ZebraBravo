@@ -52,6 +52,37 @@ class Assistant:
         else:
             self.development_interface = None
 
+    @staticmethod
+    def is_screen_description_request(request):
+        import re
+
+        text = request.strip().lower()
+        patterns = (
+            r"describe (?:my |the )?screen[?.!]?",
+            r"what(?:'s| is) on (?:my |the )?screen[?.!]?",
+            r"what can you see on (?:my |the )?screen[?.!]?",
+        )
+        return any(re.fullmatch(pattern, text) for pattern in patterns)
+
+    def describe_screen(self):
+        """Capture and interpret the screen through governed capabilities."""
+        if self.capability_runtime is None:
+            raise RuntimeError("Capability runtime is not configured.")
+
+        capture = self.capability_runtime.execute(
+            "desktop", {"operation": "capture"}
+        )
+        if not capture.ok:
+            return capture
+
+        return self.capability_runtime.execute(
+            "vision_understanding",
+            {
+                "operation": "describe",
+                "observation": capture.data,
+            },
+        )
+
     def process_command(self, command):
         command = command.strip()
 
@@ -151,6 +182,13 @@ class Assistant:
 
             return True
 
+        if self.is_screen_description_request(command):
+            try:
+                print(self.describe_screen())
+            except Exception as exc:
+                print(f"Unable to describe screen: {exc}")
+            return True
+
         if self.intent_reasoner is None:
             print("Unknown command. Type 'help' for available commands.")
             return True
@@ -170,6 +208,9 @@ class Assistant:
         return True
 
     def process_request(self, request):
+        if self.is_screen_description_request(request):
+            return self.describe_screen()
+
         if self.intent_reasoner is None:
             raise RuntimeError("Intent reasoning is not configured.")
 

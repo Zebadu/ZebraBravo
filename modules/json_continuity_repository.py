@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 
 
 class JsonContinuityRepository:
@@ -16,8 +18,27 @@ class JsonContinuityRepository:
     def save(self, continuity):
         self.validate_continuity(continuity)
 
-        with open(self.continuity_file, "w", encoding="utf-8") as file:
-            json.dump(continuity, file, indent=4)
+        target = os.path.abspath(self.continuity_file)
+        temp_path = None
+
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=os.path.dirname(target),
+                prefix=f".{os.path.basename(target)}.",
+                suffix=".tmp",
+                delete=False,
+            ) as file:
+                temp_path = file.name
+                json.dump(continuity, file, indent=4)
+                file.flush()
+                os.fsync(file.fileno())
+
+            os.replace(temp_path, target)
+        finally:
+            if temp_path is not None and os.path.exists(temp_path):
+                os.unlink(temp_path)
 
     def validate_continuity(self, continuity):
         if not isinstance(continuity, dict):

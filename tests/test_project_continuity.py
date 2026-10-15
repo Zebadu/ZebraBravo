@@ -2,6 +2,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -348,3 +349,50 @@ def test_zoey_visual_canon_domain_exists():
         )
     finally:
         continuity_file.unlink()
+
+def _create_isolated_continuity_repository(directory):
+    source_file = PROJECT_ROOT / "data" / "project_continuity.json"
+    with open(source_file, "r", encoding="utf-8") as file:
+        continuity = json.load(file)
+
+    target = Path(directory) / "continuity.json"
+    target.write_text(json.dumps(continuity, indent=4), encoding="utf-8")
+    return target, JsonContinuityRepository(target)
+
+
+def test_continuity_save_preserves_record_on_serialization_failure(tmp_path):
+    target, repository = _create_isolated_continuity_repository(tmp_path)
+    original_bytes = target.read_bytes()
+    continuity = repository.load()
+    continuity["test_unserializable_value"] = object()
+
+    try:
+        repository.save(continuity)
+    except TypeError:
+        pass
+    else:
+        raise AssertionError("Expected JSON serialization to fail.")
+
+    assert target.read_bytes() == original_bytes
+    assert list(tmp_path.glob(".continuity.json.*.tmp")) == []
+
+
+def test_continuity_save_preserves_record_on_replace_failure(tmp_path):
+    target, repository = _create_isolated_continuity_repository(tmp_path)
+    original_bytes = target.read_bytes()
+    continuity = repository.load()
+    continuity["next_action"] = "This update must not be committed."
+
+    try:
+        with patch(
+            "json_continuity_repository.os.replace",
+            side_effect=OSError("Simulated replacement failure"),
+        ):
+            repository.save(continuity)
+    except OSError as error:
+        assert str(error) == "Simulated replacement failure"
+    else:
+        raise AssertionError("Expected replacement to fail.")
+
+    assert target.read_bytes() == original_bytes
+    assert list(tmp_path.glob(".continuity.json.*.tmp")) == []
